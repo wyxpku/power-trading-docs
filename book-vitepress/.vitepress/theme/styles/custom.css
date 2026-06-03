@@ -1,1 +1,55 @@
-/* Custom styles placeholder - will be populated in Task 5 */
+/* === Table styling (from OCR) === */
+.table-container {
+  overflow-x: auto;
+  margin: 1.5rem 0;
+}
+
+.table-container table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.table-container td,
+.table-container th {
+  border: 1px solid var(--vp-c-divider);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.table-container tr:nth-child(even) {
+  background: var(--vp-c-default-soft);
+}
+
+/* === Figure styling === */
+figure,
+.embedded-figure {
+  margin: 1.5rem 0;
+  text-align: center;
+}
+
+.embedded-figure img {
+  max-width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.embedded-figure figcaption {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--vp-c-text-2);
+  font-style: italic;
+}
+
+/* === Narrow content width for better readability === */
+.VPDoc .content-container {
+  max-width: 720px !important;
+}
+
+/* === Scan viewer: offset content when split view active === */
+@media (min-width: 1280px) {
+  body:not(.scan-hidden) .VPDoc .container {
+    max-width: 55%;
+  }
+}
