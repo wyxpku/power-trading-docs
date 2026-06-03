@@ -412,7 +412,7 @@ EC 从监管的形式、监管的过程和监管的结果三个方面对欧洲�
 
 <div class="table-container">
 
-<table><tr><td rowspan="11">市场可持续发展指标</td><td rowspan="4">社会的可持续发展</td><td>各国能源独立程度（%）</td></tr><tr><td>进口能源的多样性</td></tr><tr><td>单位能源的研究经费</td></tr><tr><td>燃料成本占家庭净收入的比例过大的用户数</td></tr><tr><td rowspan="5">环境的可持续发展</td><td>每发一度电的平均  $ CO_{{2}} $ 排放量</td></tr><tr><td>用于发展可再生能源的总科研经费</td></tr><tr><td>可再生能源发电所占的比例</td></tr><tr><td>可再生能源发电量的年增长率</td></tr><tr><td>用于推广使用可再生能源的经费</td></tr><tr><td rowspan="2">经济的可持续发展</td><td>电能的平均转换效率</td></tr><tr><td>进口能源的费用占该国 GDP 的比重</td></tr></table>
+<table><tr><td rowspan="11">市场可持续发展指标</td><td rowspan="4">社会的可持续发展</td><td>各国能源独立程度（%）</td></tr><tr><td>进口能源的多样性</td></tr><tr><td>单位能源的研究经费</td></tr><tr><td>燃料成本占家庭净收入的比例过大的用户数</td></tr><tr><td rowspan="5">环境的可持续发展</td><td>每发一度电的平均 CO₂ 排放量</td></tr><tr><td>用于发展可再生能源的总科研经费</td></tr><tr><td>可再生能源发电所占的比例</td></tr><tr><td>可再生能源发电量的年增长率</td></tr><tr><td>用于推广使用可再生能源的经费</td></tr><tr><td rowspan="2">经济的可持续发展</td><td>电能的平均转换效率</td></tr><tr><td>进口能源的费用占该国 GDP 的比重</td></tr></table>
 
 </div>
 
