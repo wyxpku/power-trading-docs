@@ -5,8 +5,7 @@
   <title>第24章 辅助服务市场出清 - 《电力现货市场实务》</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="split-view"> <!-- default to split view side-by-side -->
-
+<body class="split-view">
   <div id="app-container">
     <aside id="sidebar">
   <div class="sidebar-header">
@@ -73,7 +72,7 @@
     <div class="toc-group">
       <div class="toc-group-title">第五篇 展望篇</div>
       <ul class="toc-list">
-        <li class="toc-item"><a class="toc-link " href="chapter_31.html">第31章 “双碳”目标和新型电力系统下的电力市场展望</a></li>
+        <li class="toc-item"><a class="toc-link " href="chapter_31.html">第31章 "双碳"目标和新型电力系统下的电力市场展望</a></li>
       </ul>
     </div>
     <div class="toc-group">
@@ -85,214 +84,240 @@
     </div>
   </nav>
 </aside>
-    
+
     <main id="content-wrapper">
       <header id="topbar">
         <div class="controls-left">
           <h1>第24章 辅助服务市场出清</h1>
         </div>
         <div class="controls-right">
-          <!-- Theme selector button group -->
           <div class="theme-selector">
             <button class="theme-btn active" onclick="setTheme('light')">明亮</button>
             <button class="theme-btn" onclick="setTheme('cream')">护眼</button>
             <button class="theme-btn" onclick="setTheme('dark')">深色</button>
           </div>
-          
-          <!-- Dual view selector button group -->
           <div class="view-selector">
             <button class="view-btn" id="btn-text-only" onclick="setViewMode('text')">纯文本</button>
             <button class="view-btn active" id="btn-split" onclick="setViewMode('split')">对照扫描件</button>
           </div>
         </div>
       </header>
-      
+
       <div id="reader-container">
-        <!-- Transcribed HTML Text panel -->
         <div class="panel" id="text-panel">
           <article class="reading-content">
-            <div class="page-divider" id="page-div-503" data-page="503">
-  <span class="page-number-badge">PDF 第 503 页 / 书第 486 页</span>
-</div>
-<div class="page-body-container" id="page-content-503">
-<figure class="embedded-figure">
-  <img src="pages/crops/page_503_fig1.png" alt="调频需求计算、出清数据准备-报价数据、出清数据准备-性能数据界面截图">
-  <figcaption>图24-1 调频需求计算；图24-2 出清数据准备-报价数据；图24-3 出清数据准备-性能数据</figcaption>
-</figure>
-</div>
 <div class="page-divider" id="page-div-504" data-page="504">
   <span class="page-number-badge">PDF 第 504 页 / 书第 487 页</span>
 </div>
 <div class="page-body-container" id="page-content-504">
-<p>（3）调频性能数据。从调度自动化系统AGC应用功能中接收调频机组的调节精度、调节速率、响应时间等调频性能指标信息；该调频性能指标可用于调频机组参与市场出清的准入判断。</p>
-<p>按照设定规则对调频辅助服务市场计算场景下的各类边界数据进行完整性、合理性校验，存在数据缺失或数据错误时按照严重等级给出告警。</p>
-<h3>24.1.3 调频市场出清</h3>
-<p>根据市场主体的市场申报数据，以机组组合状态、调频需求、机组调频性能、机组可调出力、调频状态等作为市场边界，以购买调频容量费用最小为目标，集中出清各交易时段的调频中标机组，形成调频市场出清价格，中标结果送AGC调用执行，调频市场出清界面如图24-4所示。</p>
-<figure class="embedded-figure">
-  <img src="pages/crops/page_504_fig1.png" alt="调频市场出清界面截图">
-  <figcaption>图24-4 调频市场出清</figcaption>
-</figure>
-<p>调频辅助服务市场可采用多种出清模式，包括：</p>
-<p>（1）日前预出清与日内正式出清。日前开展调频市场预出清，预出清结果不用于最终调用及结算；日内开展正式出清，正式出清结果用于调用及结算。</p>
-<p>（2）日前正式出清。日前开展调频市场正式出清，出清结果作为日前、日内计划编制的边界条件，同时用于调用及执行。</p>
-<p>（3）日内正式出清。日前不开展市场出清，日内开展正式出清，出清结果用于调用及结算。</p>
-<p>调频辅助服务市场可与电能量市场统一出清或顺序出清，顺序出清情况下，在电能量市场前出清时调频市场中标结果作为电能量市场的边界条件，使用中标机组的中标容量修正其参与电能量市场的可调上下限；在电能量市场后出清时，机组电能计划作为调频市场边界。</p>
-<p>一般以AGC控制单元作为竞价单元参与调频市场竞价、出清，即单机控制单元以单机参与，套机控制单元以套机参与。</p>
-</div>
+	<p>（3）调频性能数据。从调度自动化系统 AGC 应用功能中接收调频机组的调节精度、调节速率、响应时间等调频性能指标信息；该调频性能指标可用于调频机组参与市场出清的准入判断。</p>
+	<p>按照设定规则对调频辅助服务市场计算场景下的各类边界数据进行完整性、合理性校验，存在数据缺失或数据错误时按照严重等级给出告警。</p>
+	<h3>24.1.3 调频市场出清</h3>
+	<p>根据市场主体的市场申报数据，以机组组合状态、调频需求、机组调频性能、机组可调出力、调频状态等作为市场边界，以购买调频容量费用最小为目标，集中出清各交易时段的调频中标机组，形成调频市场出清价格，中标结果送AGC调用执行，调频市场出清界面如图24-4所示。</p>
+	<figure class="embedded-figure">
+	  <img src="pages/crops/page_504_fig1.png" alt="图 page 504 fig 1">
+	  <figcaption>图 page 504 fig 1</figcaption>
+	</figure>
+	<p><em>图24-4 调频市场出清</em></p>
+	<p>调频辅助服务市场可采用多种出清模式，包括：</p>
+	<p>（1）日前预出清与日内正式出清。日前开展调频市场预出清，预出清结果不用于最终调用及结算；日内开展正式出清，正式出清结果用于调用及结算。</p>
+	<p>（2）日前正式出清。日前开展调频市场正式出清，出清结果作为日前、日内计划编制的边界条件，同时用于调用及执行。</p>
+	<p>（3）日内正式出清。日前不开展市场出清，日内开展正式出清，出清结果用于调用及结算。</p>
+	<p>调频辅助服务市场可与电能量市场统一出清或顺序出清，顺序出清情况下，在电能量市场前出清时调频市场中标结果作为电能量市场的边界条件，使用中标机组的中标容量修正其参与电能量市场的可调上下限；在电能量市场后出清时，机组电能计划作为调频市场边界。</p>
+	<p>一般以 AGC 控制单元作为竞价单元参与调频市场竞价、出清，即单机控制单元以单机参与，套机控制单元以套机参与。</p>
+	</div>
 <div class="page-divider" id="page-div-505" data-page="505">
   <span class="page-number-badge">PDF 第 505 页 / 书第 488 页</span>
 </div>
 <div class="page-body-container" id="page-content-505">
-<h3>24.1.4 出清结果查询</h3>
-<p>查询调频市场出清结果，包括各交易时段出清总量、中标机组台数、市场出清价格以及中标机组、中标容量、调频性能等，其中市场出清价格一般包括调频容量出清价格、调频里程出清价格，出清结果查询界面如图24-5所示。</p>
-<figure class="embedded-figure">
-  <img src="pages/crops/page_505_fig2.png" alt="出清结果查询界面截图">
-  <figcaption>图24-5 出清结果查询</figcaption>
-</figure>
-<h3>24.1.5 调频结果管理</h3>
-<p>在调频市场出清后，因电网安全运行要求或机组自身运行原因，可通过人工干预增加或取消调频机组。人工干预界面如图24-6所示，主要包括：</p>
-<p>（1）人工增调、取消调频机组。</p>
-<p>（2）全面准确记录人工干预信息，记录内容应包括操作人、操作时间、操作内容、操作原因等信息。</p>
-<figure class="embedded-figure">
-  <img src="pages/crops/page_505_fig1.png" alt="人工干预界面截图">
-  <figcaption>图24-6 人工干预</figcaption>
-</figure>
-</div>
+	<h3>24.1.4 出清结果查询</h3>
+	<p>查询调频市场出清结果，包括各交易时段出清总量、中标机组台数、市场出清价格以及中标机组、中标容量、调频性能等，其中市场出清价格一般包括调频容量出清价格、调频里程出清价格，出清结果查询界面如图24-5所示。</p>
+	<figure class="embedded-figure">
+	  <img src="pages/crops/page_505_fig1.png" alt="图 page 505 fig 1">
+	  <figcaption>图 page 505 fig 1</figcaption>
+	</figure>
+	<p><em>图24-5 出清结果查询</em></p>
+	<h3>24.1.5 调频结果管理</h3>
+	<p>在调频市场出清后，因电网安全运行要求或机组自身运行原因，可通过人工干预增加或取消调频机组。人工干预界面如图24-6所示，主要包括：</p>
+	<p>（1）人工增调、取消调频机组。</p>
+	<p>（2）全面准确记录人工干预信息，记录内容应包括操作人、操作时间、操作内容、操作原因等信息。</p>
+	<figure class="embedded-figure">
+	  <img src="pages/crops/page_505_fig2.png" alt="图 page 505 fig 2">
+	  <figcaption>图 page 505 fig 2</figcaption>
+	</figure>
+	<p><em>图24-6 人工干预</em></p>
+	</div>
 <div class="page-divider" id="page-div-506" data-page="506">
   <span class="page-number-badge">PDF 第 506 页 / 书第 489 页</span>
 </div>
 <div class="page-body-container" id="page-content-506">
-<h2>24.2 备用辅助服务市场</h2>
-<p>开展备用辅助服务市场化交易，包括备用需求计算、备用数据准备、备用市场出清、出清结果查询、备用结果管理。</p>
-<h3>24.2.1 备用需求计算</h3>
-<p>基于电网运行情况，按照系统负荷预测比例、备用参数等多种方式，计算备用辅助服务市场各交易时段的备用容量需求（如图24-7所示），支持对备用需求进行人工干预调整；按照市场规则向市场成员发布调频备用、系统负荷预测等市场相关信息。</p>
-<figure class="embedded-figure">
-  <img src="pages/crops/page_506_fig1.png" alt="备用需求计算界面截图">
-  <figcaption>图24-7 备用需求计算</figcaption>
-</figure>
-<h3>24.2.2 备用数据准备</h3>
-<p>获取备用市场出清所需的申报类、运行类边界数据，形成备用市场出清计算场景，主要数据包括申报类数据、运行类数据。</p>
-<p>（1）申报类数据。机组申报的备用市场量价信息，如图24-8所示。</p>
-<p>（2）运行类数据。备用需求、机组组合、机组实时运行状态、系统负荷预测等边界数据。</p>
-<p>按照设定规则对备用辅助服务市场计算场景下的各类边界数据进行完整性、合理性校验，存在数据缺失或数据错误时按照严重等级给出告警。</p>
-<h3>24.2.3 备用市场出清</h3>
-<p>根据市场主体的市场申报数据，以备用需求、系统负荷预测、机组组合等作为市场边界，以购买备用资源费用最小为目标，集中出清各交易时段的备用中标机组，形成备用</p>
-</div>
+	<h2>24.2 备用辅助服务市场</h2>
+	<p>开展备用辅助服务市场化交易，包括备用需求计算、备用数据准备、备用市场出清、出清结果查询、备用结果管理。</p>
+	<h3>24.2.1 备用需求计算</h3>
+	<p>基于电网运行情况，按照系统负荷预测比例、备用参数等多种方式，计算备用辅助服务市场各交易时段的备用容量需求（如图24-7所示），支持对备用需求进行人工干预调整；按照市场规则向市场成员发布调频备用、系统负荷预测等市场相关信息。</p>
+	<figure class="embedded-figure">
+	  <img src="pages/crops/page_506_fig1.png" alt="图 page 506 fig 1">
+	  <figcaption>图 page 506 fig 1</figcaption>
+	</figure>
+	<p><em>图24-7 备用需求计算</em></p>
+	<h3>24.2.2 备用数据准备</h3>
+	<p>获取备用市场出清所需的申报类、运行类边界数据，形成备用市场出清计算场景，主要数据包括申报类数据、运行类数据。</p>
+	<p>（1）申报类数据。机组申报的备用市场量价信息，如图24-8所示。</p>
+	<p>（2）运行类数据。备用需求、机组组合、机组实时运行状态、系统负荷预测等边界数据。</p>
+	<p>按照设定规则对备用辅助服务市场计算场景下的各类边界数据进行完整性、合理性校验，存在数据缺失或数据错误时按照严重等级给出告警。</p>
+	<h3>24.2.3 备用市场出清</h3>
+	<p>根据市场主体的市场申报数据，以备用需求、系统负荷预测、机组组合等作为市场边界，以购买备用资源费用最小为目标，集中出清各交易时段的备用中标机组，形成备用</p>
+	</div>
 <div class="page-divider" id="page-div-507" data-page="507">
   <span class="page-number-badge">PDF 第 507 页 / 书第 490 页</span>
 </div>
 <div class="page-body-container" id="page-content-507">
-<figure class="embedded-figure">
-  <img src="pages/crops/page_507_fig2.png" alt="备用数据准备-申报数据界面截图">
-  <figcaption>图24-8 备用数据准备–申报数据</figcaption>
-</figure>
-<p>市场出清价格。备用市场出清一般分为日前市场出清、实时市场出清，可与电能量市场联合出清或顺序出清；顺序出清时备用市场出清结果作为电能量市场的边界条件。</p>
-<h3>24.2.4 出清结果查询</h3>
-<p>查询备用市场出清结果如图24-9所示，包括各交易时段出清总量、中标机组台数、市场出清价格以及中标机组、中标容量等。</p>
-<figure class="embedded-figure">
-  <img src="pages/crops/page_507_fig1.png" alt="备用市场出清结果查询界面截图">
-  <figcaption>图24-9 备用市场出清结果查询</figcaption>
-</figure>
-<h3>24.2.5 备用结果管理</h3>
-<p>在备用市场出清后，因电网安全运行要求或机组自身运行原因，可通过人工干预设定机组备用容量。备用市场人工干预如图24-10所示，主要包括：</p>
-<p>（1）人工指定或取消备用机组，设置机组备用容量。</p>
-<p>（2）全面准确记录人工干预信息，记录内容应包括操作人、操作时间、操作内容、操作原因等信息。</p>
-</div>
+	<figure class="embedded-figure">
+	  <img src="pages/crops/page_507_fig1.png" alt="图 page 507 fig 1">
+	  <figcaption>图 page 507 fig 1</figcaption>
+	</figure>
+	<p><em>图24-8 备用数据准备-申报数据</em></p>
+	<p>市场出清价格。</p>
+	<p>备用市场出清一般分为日前市场出清、实时市场出清，可与电能量市场联合出清或顺序出清；顺序出清时备用市场出清结果作为电能量市场的边界条件。</p>
+	<h3>24.2.4 出清结果查询</h3>
+	<p>查询备用市场出清结果如图24-9所示，包括各交易时段出清总量、中标机组台数、市场出清价格以及中标机组、中标容量等。</p>
+	<figure class="embedded-figure">
+	  <img src="pages/crops/page_507_fig2.png" alt="图 page 507 fig 2">
+	  <figcaption>图 page 507 fig 2</figcaption>
+	</figure>
+	<p><em>图24-9 备用市场出清结果查询</em></p>
+	<h3>24.2.5 备用结果管理</h3>
+	<p>在备用市场出清后，因电网安全运行要求或机组自身运行原因，可通过人工干预设定机组备用容量。备用市场人工干预如图24-10所示，主要包括：</p>
+	<p>（1）人工指定或取消备用机组，设置机组备用容量。</p>
+	<p>（2）全面准确记录人工干预信息，记录内容应包括操作人、操作时间、操作内容、操作原因等信息。</p>
+	</div>
 <div class="page-divider" id="page-div-508" data-page="508">
   <span class="page-number-badge">PDF 第 508 页 / 书第 491 页</span>
 </div>
 <div class="page-body-container" id="page-content-508">
-<figure class="embedded-figure">
-  <img src="pages/crops/page_508_fig2.png" alt="备用市场人工干预界面截图">
-  <figcaption>图24-10 备用市场人工干预</figcaption>
-</figure>
-<h2>24.3 调峰市场</h2>
-<p>开展调峰市场化交易，包括调峰需求计算、调峰市场数据准备、调峰市场出清、出清结果查询、调峰结果管理。</p>
-<h3>24.3.1 调峰需求计算</h3>
-<p>基于系统负荷预测、新能源预测、联络线计划、机组可调、机组组合等边界数据开展96时段电网平衡分析，针对不足时段计算调峰需求，支持对调峰需求进行人工干预调整；按照市场规则向市场成员发布调峰需求、系统负荷预测等市场相关信息。调峰需求界面如图24-11所示。</p>
-<figure class="embedded-figure">
-  <img src="pages/crops/page_508_fig1.png" alt="调峰需求管理界面截图">
-  <figcaption>图24-11 调峰需求管理</figcaption>
-</figure>
-<h3>24.3.2 调峰市场数据准备</h3>
-<p>获取调峰市场出清所需的申报类、运行类边界数据，形成调峰市场出清计算场景，主要数据包括申报类数据、运行类数据。</p>
-</div>
+	<figure class="embedded-figure">
+	  <img src="pages/crops/page_508_fig1.png" alt="图 page 508 fig 1">
+	  <figcaption>图 page 508 fig 1</figcaption>
+	</figure>
+	<p><em>图24-10 备用市场人工干预</em></p>
+	<h2>24.3 调峰市场</h2>
+	<p>开展调峰市场化交易，包括调峰需求计算、调峰市场数据准备、调峰市场出清、出清结果查询、调峰结果管理。</p>
+	<h3>24.3.1 调峰需求计算</h3>
+	<p>基于系统负荷预测、新能源预测、联络线计划、机组可调、机组组合等边界数据开展96时段电网平衡分析，针对不足时段计算调峰需求，支持对调峰需求进行人工干预调整；按照市场规则向市场成员发布调峰需求、系统负荷预测等市场相关信息。调峰需求界面如图24-11所示。</p>
+	<figure class="embedded-figure">
+	  <img src="pages/crops/page_508_fig2.png" alt="图 page 508 fig 2">
+	  <figcaption>图 page 508 fig 2</figcaption>
+	</figure>
+	<p><em>图24-11 调峰需求管理</em></p>
+	<h3>24.3.2 调峰市场数据准备</h3>
+	<p>获取调峰市场出清所需的申报类、运行类边界数据，形成调峰市场出清计算场景，主要数据包括申报类数据、运行类数据。</p>
+	</div>
 <div class="page-divider" id="page-div-509" data-page="509">
   <span class="page-number-badge">PDF 第 509 页 / 书第 492 页</span>
 </div>
 <div class="page-body-container" id="page-content-509">
-<p>（1）申报类数据。机组申报的调峰市场报价及深调下限数据，其中深调报价一般按照50%负荷率以下分挡申报，如图24-12所示。</p>
-<p>（2）运行类数据。调峰需求、机组组合、机组实时运行状态等边界数据。</p>
-<p>按照设定规则对调峰市场计算场景下的各类边界数据进行完整性、合理性校验，存在数据缺失或数据错误时按照严重等级给出告警。</p>
-<figure class="embedded-figure">
-  <img src="pages/crops/page_509_fig1.png" alt="调峰市场分挡报价情况界面截图">
-  <figcaption>图24-12 调峰市场分挡报价情况</figcaption>
-</figure>
-<h3>24.3.3 调峰市场出清</h3>
-<p>根据市场主体的市场申报数据，以机组组合状态、调峰需求、机组调峰下限、机组爬坡滑坡能力等作为市场边界，以购买调峰资源费用最小为目标，集中出清各交易时段的调峰中标机组，形成调峰市场出清价格。</p>
-<p>调峰市场可采用多种出清模式，包括：</p>
-<p>（1）日前预出清与日内正式出清。日前开展调峰市场预出清，预出清结果不用于最终调用及结算；日内开展正式出清，正式出清结果用于调用及结算。</p>
-<p>（2）日内正式出清。日前不开展市场出清，日内开展正式出清，出清结果用于调用及结算。</p>
-<p>调峰市场可与电能量市场统一出清或顺序出清；顺序出清情况下，调峰市场中标结果作为电能量市场的边界条件，中标机组不参与电能量市场优化。</p>
-<h3>24.3.4 出清结果查询</h3>
-<p>查询调峰市场出清结果如图24-13所示，包括各交易时段出清总量、中标机组台数、市场分档出清价格以及中标机组、分档中标电力等。</p>
-<h3>24.3.5 调峰结果管理</h3>
-<p>在调峰市场出清后，因电网安全运行要求或机组自身运行原因，可通过人工干预设定</p>
-</div>
+	<p>（1）申报类数据。机组申报的调峰市场报价及深调下限数据，其中深调报价一般按照50%负荷率以下分挡申报，如图24-12所示。</p>
+	<p>（2）运行类数据。调峰需求、机组组合、机组实时运行状态等边界数据。</p>
+	<p>按照设定规则对调峰市场计算场景下的各类边界数据进行完整性、合理性校验，存在数据缺失或数据错误时按照严重等级给出告警。</p>
+	<p><em>图24-12 调峰市场分挡报价情况</em></p>
+	<h3>24.3.3 调峰市场出清</h3>
+	<p>根据市场主体的市场申报数据，以机组组合状态、调峰需求、机组调峰下限、机组爬坡滑坡能力等作为市场边界，以购买调峰资源费用最小为目标，集中出清各交易时段的调峰中标机组，形成调峰市场出清价格。</p>
+	<p>调峰市场可采用多种出清模式，包括：</p>
+	<p>（1）日前预出清与日内正式出清。日前开展调峰市场预出清，预出清结果不用于最终调用及结算；日内开展正式出清，正式出清结果用于调用及结算。</p>
+	<p>（2）日内正式出清。日前不开展市场出清，日内开展正式出清，出清结果用于调用及结算。</p>
+	<p>调峰市场可与电能量市场统一出清或顺序出清；顺序出清情况下，调峰市场中标结果作为电能量市场的边界条件，中标机组不参与电能量市场优化。</p>
+	<h3>24.3.4 出清结果查询</h3>
+	<p>查询调峰市场出清结果如图24-13所示，包括各交易时段出清总量、中标机组台数、市场分档出清价格以及中标机组、分档中标电力等。</p>
+	<h3>24.3.5 调峰结果管理</h3>
+	<p>在调峰市场出清后，因电网安全运行要求或机组自身运行原因，可通过人工干预设定</p>
+	</div>
 <div class="page-divider" id="page-div-510" data-page="510">
   <span class="page-number-badge">PDF 第 510 页 / 书第 493 页</span>
 </div>
 <div class="page-body-container" id="page-content-510">
-<figure class="embedded-figure">
-  <img src="pages/crops/page_510_fig1.png" alt="调峰市场出清结果界面截图">
-  <figcaption>图24-13 调峰市场出清结果</figcaption>
-</figure>
-<p>机组调峰容量。主要包括：</p>
-<p>（1）人工指定或取消调峰机组，设置机组调峰容量。</p>
-<p>（2）全面准确记录人工干预信息，记录内容应包括操作人、操作时间、操作内容、操作原因等信息。</p>
-<h2>24.4 辅助服务与电能量联合出清</h2>
-<p>电能与辅助服务独立出清是电能与辅助服务市场分别独立出清，可以先辅助服务后电能或先电能后辅助服务，先出清完成的市场结果作为后续市场出清的边界约束条件，每个市场在其独立出清时保证其所购买的电力资源成本最小。</p>
-<p>电能与辅助服务联合出清是指在市场出清计算时根据电能与辅助服务的报价，考虑电能与辅助服务之间约束耦合关系，以电能与辅助服务总购买成本最小为优化目标，一次出清计算生成电能与辅助服务出清结果及价格。</p>
-<p>优化目标为电能与调频备用等辅助成本之和最小，即</p>
-<div class="equation-wrapper">$\min F = \sum_{t=1}^{NT} \sum_{i=1}^{NI} \left[ C_{i,t} + ST_{i,t} + SD_{i,t} + M_{i,t} \right]$<span class="equation-number">（24-1）</span>
-</div>
-<p>式中：NT为系统调度周期所含时段数；NI为系统中参与调度的机组数；$C_{i,t}$为机组i在t时的发电成本；$ST_{i,t}$和$SD_{i,t}$分别为机组i在t时的启动成本和停机成本；$M_{i,t}$为机组i在t时的调频备用成本。在电能量和辅助服务联合优化时，除了电能量约束之外，增加调频状态最大及最小经济出力限制、备用爬坡速率限制、备用竞价容量限制等，还需考虑能量与辅助服务联合约束。</p>
-<p>联合出清可以实现最经济的电能与辅助服务安排，但其算法复杂，理解难度大；独立出清只能实现单个市场出清结果的成本最优，无法实现电能与辅助服务总成本最优，但其算法较为简单，易于理解。在电力现货市场初期，一般采用电能与辅助服务市场独立</p>
-</div>
+	<figure class="embedded-figure">
+	  <img src="pages/crops/page_510_fig1.png" alt="图 page 510 fig 1">
+	  <figcaption>图 page 510 fig 1</figcaption>
+	</figure>
+	<p><em>图24-13 调峰市场出清结果</em></p>
+	<p>机组调峰容量。主要包括：</p>
+	<p>（1）人工指定或取消调峰机组，设置机组调峰容量。</p>
+	<p>（2）全面准确记录人工干预信息，记录内容应包括操作人、操作时间、操作内容、操作原因等信息。</p>
+	<h2>24.4 辅助服务与电能量联合出清</h2>
+	<p>电能与辅助服务独立出清是电能与辅助服务市场分别独立出清，可以先辅助服务后电能或先电能后辅助服务，先出清完成的市场结果作为后续市场出清的边界约束条件，每个市场在其独立出清时保证其所购买的电力资源成本最小。</p>
+	<p>电能与辅助服务联合出清是指在市场出清计算时根据电能与辅助服务的报价，考虑电能与辅助服务之间约束耦合关系，以电能与辅助服务总购买成本最小为优化目标，一次出清计算生成电能与辅助服务出清结果及价格。</p>
+	<p>优化目标为电能与调频备用等辅助成本之和最小，即</p>
+	<p>$$ \min F=\sum_{i=1}^{NT}\sum_{i=1}^{NI}[C_{i,t}+ST_{i,t}+SD_{i,t}+M_{i,t}] $$</p>
+	<p>(24-1)</p>
+	<p>式中： $ NT $ 为系统调度周期所含时段数； $ NI $ 为系统中参与调度的机组数； $ C_{i,t} $ 为机组  $ i $ 在  $ t $ 时的发电成本； $ ST_{i,t} $ 和  $ SD_{i,t} $ 分别为机组  $ i $ 在  $ t $ 时的启动成本和停机成本； $ M_{i,t} $ 为机组  $ i $ 在  $ t $ 时的调频备用成本。在电能量和辅助服务联合优化时，除了电能量约束之外，增加调频状态最大及最小经济出力限制、备用爬坡速率限制、备用竞价容量限制等，还需考虑能量与辅助服务联合约束。</p>
+	<p>联合出清可以实现最经济的电能与辅助服务安排，但其算法复杂，理解难度大；独立出清只能实现单个市场出清结果的成本最优，无法实现电能与辅助服务总成本最优，但其算法较为简单，易于理解。在电力现货市场初期，一般采用电能与辅助服务市场独立</p>
+	</div>
 <div class="page-divider" id="page-div-511" data-page="511">
   <span class="page-number-badge">PDF 第 511 页 / 书第 494 页</span>
 </div>
 <div class="page-body-container" id="page-content-511">
-<p>出清模式，在市场成熟期，再采用电能与辅助服务联合出清模式。</p>
-<h2>24.5 本章小结</h2>
-<p>辅助服务作为一种重要的电力交易品种，是维护电力系统安全稳定运行、保证电量质量必要服务，与电能量存在相互耦合关系。本章重点介绍了调频、备用、调峰辅助服务市场应用功能，包括市场需求计算、市场数据准备、市场出清、出清结果查询、结果管理等模块，详细阐述了电能与辅助服务市场联合出清功能。</p>
-</div>
+	<p>出清模式，在市场成熟期，再采用电能与辅助服务联合出清模式。</p>
+	<h2>24.5 本章小结</h2>
+	<p>辅助服务作为一种重要的电力交易品种，是维护电力系统安全稳定运行、保证电量质量必要服务，与电能量存在相互耦合关系。本章重点介绍了调频、备用、调峰辅助服务市场应用功能，包括市场需求计算、市场数据准备、市场出清、出清结果查询、结果管理等模块，详细阐述了电能与辅助服务市场联合出清功能。</p>
+	</div>
 <div class="page-divider" id="page-div-512" data-page="512">
   <span class="page-number-badge">PDF 第 512 页 / 书第 495 页</span>
 </div>
 <div class="page-body-container" id="page-content-512">
-<h1>第25章 安全校核</h1>
-<p>安全校核主要是为电力现货市场出清计算提供静态安全校核计算服务支撑，保障市场出清结果满足电网安全运行约束条件。安全校核向电力现货市场提供灵敏度信息和潮流安全分析结果，市场出清结果根据潮流安全分析结果并基于灵敏度信息对出清结果进行调整。考虑短路电流与出清结果之间非线性化关系，出清算法难以建立直接的短路电流控制约束条件，一般通过间接设置开机方式约束来控制短路电流，因此，短路电流计算不作为潮流安全分析的一个功能在本书中进行阐述。</p>
-<h2>25.1 计划拓扑生成与分析</h2>
-<p>计划方式生成的基础数据有电网模型、方式数据、母线负荷预测、联络线计划、发电计划、设备检修计划。静态安全校核利用检修反演机制，生成电网的正常运行方式，即以某历史方式数据为基础，在获取该方式对应的检修计划后，通过对检修计划的反演操作，如原先检修的设备予以并网，获得电网正常接排方式，然后根据校核时段的检修计划信息，进行相应的操作模拟，最终形成校核的电网拓扑。</p>
-<p>计划方式生成将所有负荷节点的有功功率替换为母线负荷预测，将所有发电机功率替换为发电计划，将所有联络线节点注入功率替换为联络线计划。考虑到母线负荷预测精度存在一定偏差，当存在有功功率不平衡时，采用拉升母线负荷预测功率的方式保证功率平衡。负荷节点的无功功率可采用母线负荷预测无功功率和利用功率因数折算两种方法获得，其中功率因数可以使用规程规定的值，或利用历史数据统计得到的工程经验值。</p>
-<p>利用交流潮流方法（PQ解耦法、牛顿-拉夫逊法）获得未来断面的潮流分布，当交流潮流不收敛时，自动用直流潮流法计算，获得有功潮流分布。</p>
-<h2>25.2 基态潮流分析</h2>
-<p>基态潮流分析根据自动生成的校核断面潮流进行分析计算，判断基态潮流下的设备越限情况。</p>
+	<h2>安 全 校 核</h2>
+	<p>安全校核主要是为电力现货市场出清计算提供静态安全校核计算服务支撑，保障市场出清结果满足电网安全运行约束条件。安全校核向电力现货市场提供灵敏度信息和潮流安全分析结果，市场出清结果根据潮流安全分析结果并基于灵敏度信息对出清结果进行调整。考虑短路电流与出清结果之间非线性化关系，出清算法难以建立直接的短路电流控制约束条件，一般通过间接设置开机方式约束来控制短路电流，因此，短路电流计算不作为潮流安全分析的一个功能在本书中进行阐述。</p>
+	<h2>25.1 计划拓扑生成与分析</h2>
+	<p>计划方式生成的基础数据有电网模型、方式数据、母线负荷预测、联络线计划、发电计划、设备检修计划。静态安全校核利用检修反演机制，生成电网的正常运行方式，即以某历史方式数据为基础，在获取该方式对应的检修计划后，通过对检修计划的反演操作，如原先检修的设备予以并网，获得电网正常排排方式，然后根据校核时段的检修计划信息，进行相应的操作模拟，最终形成校核的电网拓扑。</p>
+	<p>计划方式生成将所有负荷节点的有功功率替换为母线负荷预测，将所有发电机功率替换为发电计划，将所有联络线节点注入功率替换为联络线计划。考虑到母线负荷预测精度存在一定偏差，当存在有功功率不平衡时，采用拉升母线负荷预测功率的方式保证功率平衡。负荷节点的无功功率可采用母线负荷预测无功功率和利用功率因数折算两种方法获得，其中功率因数可以使用规程规定的值，或利用历史数据统计得到的工程经验值。</p>
+	<p>利用交流潮流方法（PQ 解耦法、牛顿－拉夫逊法）获得未来断面的潮流分布，当交流潮流不收敛时，自动用直流潮流法计算，获得有功潮流分布。</p>
+	<h2>25.2 基态潮流分析</h2>
+	<p>基态潮流分析根据自动生成的校核断面潮流进行分析计算，判断基态潮流下的设备越限情况。</p>
+	</div>
+<div class="page-divider" id="page-div-513" data-page="513">
+  <span class="page-number-badge">PDF 第 513 页 / 书第 496 页</span>
 </div>
+<div class="page-body-container" id="page-content-513">
+	<p>根据潮流结果判断电网各设备是否满足安全运行要求，主要检查线路潮流是否过载、变压器是否过负荷、稳定断面有功功率是否满足控制限额要求、母线电压是否满足运行电压范围要求。</p>
+	<p>基态潮流分析检验输电线路有功功率是否满足式（25-1），输电线路有功限额采用式（25-2）计算，即</p>
+	<p>$$ P_{\mathrm{L}}\leqslant P_{\mathrm{L,m a x}} $$</p>
+	<p>(25-1)</p>
+	<p>$$ P_{L,\mathrm{m a x}}=\sqrt{3}U_{L}I_{L,\mathrm{m a x}}\cos\varphi $$</p>
+	<p>（25-2）</p>
+	<p>式中： $ P_{L} $ 为线路有功功率； $ P_{L\text{max}} $ 为线路有功限额，MW； $ U_{L} $ 为线路运行电压，kV； $ I_{L\text{max}} $ 为线路长期电流上限，kA； $ \cos\varphi $ 为功率因数。</p>
+	<p>基态潮流分析校验变压器各侧绕组有功功率是否满足式（25-3），变压器额定有功采用式（25-4）计算，即</p>
+	<p>$$ P_{\mathrm{T}}\leqslant P_{\mathrm{T,m a x}} $$</p>
+	<p>(25-3)</p>
+	<p>$$ P_{\mathrm{T,m a x}}=S_{\mathrm{T}}\cos\varphi $$</p>
+	<p>(25-4)</p>
+	<p>式中： $ P_{T} $ 变压器绕组有功功率； $ P_{T\max} $ 为变压器绕组有功限额，MW； $ S_{T} $ 为变压器额定容量，MVA； $ \cos\phi $ 为功率因数。</p>
+	<p>基态潮流校核校验稳定断面有功功率是否满足式（25-5），稳定断面有功潮流采用式（25-6）计算，即</p>
+	<p>$$ P_{\mathrm{W D.n e g}}\leqslant P_{\mathrm{W D}}\leqslant P_{\mathrm{W D.p o s}} $$</p>
+	<p>（25-5）</p>
+	<p>$$ P_{\mathrm{WD}}{=}\sum_{i\in\mathcal{W}}K_{i}P_{i}\qquad P_{\mathrm{WD}}{=}\sum_{i\in\mathrm{WD}}K_{i}P_{i} $$</p>
+	<p>（25-6）</p>
+	<p>式中： $ P_{WD} $ 为稳定断面有功功率； $ P_{WD,pos} $ 为稳定断面正向限额，MW； $ P_{WD,neg} $ 稳定断面反向限额，MW；WD 为稳定断面组成元件集合； $ P_i $ 为第 i 个组成元件有功； $ K_i $ 为第 i 个组成元件有功系数。</p>
+	<p>基态潮流校核校验母线电压是否满足式（25-7），即</p>
+	<p>$$ U_{\mathrm{b u s,m i n}}\leq U_{\mathrm{b u s}}\leq U_{\mathrm{b u s,m a x}} $$</p>
+	<p>(25-7)</p>
+	<p>式中： $ U_{bus} $ 为母线电压幅值； $ U_{bus,max} $ 为母线运行电压上限；</p>
+	<h2>25.3 静态安全分析</h2>
+	<p>静态安全分析根据校核断面自动生成形成的校核断面潮流，分析 N-1 故障和指定故障集下的设备越限情况。</p>
+	<p>分析计算设备（或设备组合）开断后的潮流分布，并校验线路、变压器是否满足短时限额要求。</p>
+	<p>静态安全分析检验输电线路有功是否满足式（25-1），输电线路短时有功限额采用式（25-2）计算。不同的是， $ P_{L\max} $ 为线路短时有功限额， $ I_{L\max} $ 为线路短时电流上限。</p>
+	<p>静态安全分析校验变压器各侧绕组有功是否满足式（25-3），不同的是， $ P_{T\_{max}} $ 为变</p>
+	</div>
           </article>
         </div>
-        
-        <!-- Original Page Scan PNG panel -->
+
         <div class="panel" id="original-panel">
-          <img id="original-scan-img" src="pages/page_503.png" alt="扫描件">
+          <img id="original-scan-img" src="pages/page_504.png" alt="扫描件">
         </div>
       </div>
     </main>
   </div>
 
   <script>
-    // Theme Management
+
     function setTheme(theme) {
       document.documentElement.setAttribute('data-theme', theme);
       document.querySelectorAll('.theme-btn').forEach(btn => {
@@ -303,13 +328,11 @@
       });
       localStorage.setItem('reader-theme', theme);
     }
-    
-    // View Mode Management
+
     function setViewMode(mode) {
       const body = document.body;
       const btnText = document.getElementById('btn-text-only');
       const btnSplit = document.getElementById('btn-split');
-      
       if (mode === 'text') {
         body.classList.remove('split-view');
         btnText.classList.add('active');
@@ -321,18 +344,15 @@
       }
       localStorage.setItem('reader-view', mode);
     }
-    
-    // Synchronous Scroll and Image Updating
+
     const textPanel = document.getElementById('text-panel');
     const scanImg = document.getElementById('original-scan-img');
     const pageDividers = document.querySelectorAll('.page-divider');
-    
     const observerOptions = {
       root: textPanel,
       rootMargin: '-50px 0px -50% 0px',
       threshold: 0
     };
-    
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -342,17 +362,15 @@
         }
       });
     }, observerOptions);
-    
     pageDividers.forEach(div => observer.observe(div));
-    
-    // Restore User Preferences
+
     window.addEventListener('DOMContentLoaded', () => {
       const savedTheme = localStorage.getItem('reader-theme') || 'light';
       setTheme(savedTheme);
-      
       const savedView = localStorage.getItem('reader-view') || 'split';
       setViewMode(savedView);
     });
+
   </script>
 <script src="js/book-navigation.js"></script>
 </body>

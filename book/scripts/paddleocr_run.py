@@ -1,12 +1,8 @@
 #!/usr/bin/env python3
-"""Run PaddleOCR-VL on the full PDF and save per-page results.
+"""Run PaddleOCR-VL on individual page images and save per-page results.
 
-Supports two modes:
-  1. llama-server backend (fast, ~16s/page on Apple Silicon):
-     - Start llama-server first (see setup_llama_server.sh)
-     - Uses --vl_rec_backend llama-cpp-server + --vl_rec_server_url
-  2. Pure CPU mode (slow, ~99s/page):
-     - Fallback when no server is running
+Processes page_NNN.png images one at a time for incremental saving and
+progress tracking. Supports llama-server backend for acceleration.
 
 Results are saved incrementally — if interrupted, already-saved pages
 are skipped on re-run.
@@ -22,8 +18,9 @@ sys.stdout.reconfigure(line_buffering=True)
 sys.stderr.reconfigure(line_buffering=True)
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-PDF_PATH = REPO_ROOT / "docs" / "电力现货市场实务 (国家电力调度控制中心组编) (Z-Library).pdf"
+PAGES_DIR = REPO_ROOT / "book" / "pages"
 OUTPUT_DIR = REPO_ROOT / "book" / "scripts" / "paddleocr_output"
+TOTAL_PAGES = 647  # page_001.png through page_647.png
 
 # llama-server config
 LLAMA_SERVER_URL = "http://127.0.0.1:8080/v1"
@@ -44,7 +41,7 @@ def get_completed_pages():
     """Find pages that have already been processed."""
     completed = set()
     for d in OUTPUT_DIR.glob("page_*"):
-        if d.is_dir() and d.name != "restructured" and d.name != "smoke_test" and list(d.glob("*.json")):
+        if d.is_dir() and d.name not in ("restructured", "smoke_test") and list(d.glob("*.json")):
             try:
                 page_idx = int(d.name.split("_")[1])
                 completed.add(page_idx)
@@ -54,12 +51,6 @@ def get_completed_pages():
 
 
 def main():
-    print(f"PDF: {PDF_PATH}")
-    print(f"PDF exists: {PDF_PATH.exists()}")
-    if not PDF_PATH.exists():
-        print("ERROR: PDF not found!", file=sys.stderr)
-        sys.exit(1)
-
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     completed = get_completed_pages()
     print(f"Already completed: {len(completed)} pages")
@@ -80,52 +71,61 @@ def main():
         print("For acceleration, run setup_llama_server.sh first.")
         pipeline = PaddleOCRVL(device="cpu")
 
-    print("Running prediction on full PDF...")
     start_time = time.time()
-    output = pipeline.predict(input=str(PDF_PATH))
+    processed = 0
+    errors = 0
 
-    # Collect all results (this drives the full processing)
-    pages_res = []
-    for i, res in enumerate(output):
-        pages_res.append(res)
-        if i in completed:
+    for page_num in range(1, TOTAL_PAGES + 1):
+        page_idx = page_num - 1  # 0-indexed
+        page_image = PAGES_DIR / f"page_{page_num:03d}.png"
+
+        if not page_image.exists():
+            print(f"  SKIP page {page_num}: image not found")
             continue
 
-        page_dir = OUTPUT_DIR / f"page_{i:04d}"
-        page_dir.mkdir(parents=True, exist_ok=True)
+        if page_idx in completed:
+            processed += 1
+            continue
 
+        # Process single page image
         try:
-            res.save_to_json(save_path=str(page_dir))
+            output = list(pipeline.predict(input=str(page_image)))
+            if output:
+                res = output[0]
+                page_dir = OUTPUT_DIR / f"page_{page_idx:04d}"
+                page_dir.mkdir(parents=True, exist_ok=True)
+                try:
+                    res.save_to_json(save_path=str(page_dir))
+                except Exception as e:
+                    print(f"  ERROR saving page {page_num} JSON: {e}", file=sys.stderr)
+                    errors += 1
         except Exception as e:
-            print(f"  ERROR saving page {i} JSON: {e}", file=sys.stderr)
+            print(f"  ERROR processing page {page_num}: {e}", file=sys.stderr)
+            errors += 1
+            continue
 
-        if (i + 1) % 20 == 0 or i < 3:
-            elapsed = time.time() - start_time
-            rate = elapsed / (i + 1)
-            remaining = rate * (646 - i - 1)
-            print(f"  {i+1}/646 pages ({elapsed:.0f}s elapsed, ~{remaining/60:.0f}min remaining, {rate:.1f}s/page)")
+        processed += 1
+        elapsed = time.time() - start_time
+        new_pages = processed - len(completed)
+
+        if new_pages <= 3 or processed % 20 == 0:
+            rate = elapsed / new_pages if new_pages > 0 else 0
+            remaining_pages = TOTAL_PAGES - processed
+            remaining = rate * remaining_pages
+            print(f"  {processed}/{TOTAL_PAGES} pages ({elapsed:.0f}s elapsed, "
+                  f"~{remaining/60:.0f}min remaining, {rate:.1f}s/page)")
 
     elapsed = time.time() - start_time
-    print(f"Processed {len(pages_res)} pages in {elapsed:.0f}s ({elapsed/len(pages_res):.1f}s/page)")
-
-    # Cross-page restructuring (merges tables spanning pages, reorders titles)
-    print("\nRunning restructure_pages for cross-page merging...")
-    try:
-        restructured = pipeline.restructure_pages(pages_res)
-        restructure_dir = OUTPUT_DIR / "restructured"
-        restructure_dir.mkdir(parents=True, exist_ok=True)
-        for i, res in enumerate(restructured):
-            try:
-                res.save_to_json(save_path=str(restructure_dir))
-            except Exception as e:
-                print(f"  ERROR saving restructured page {i}: {e}", file=sys.stderr)
-        print("Restructured output saved.")
-    except Exception as e:
-        print(f"WARNING: restructure_pages failed: {e}", file=sys.stderr)
-        print("Continuing with per-page results only.")
+    new_pages = processed - len(completed)
+    print(f"\nProcessed {new_pages} new pages in {elapsed:.0f}s "
+          f"({elapsed/new_pages:.1f}s/page)" if new_pages > 0 else "")
+    if errors:
+        print(f"Errors: {errors}")
 
     print(f"\nDone! Results in {OUTPUT_DIR}")
-    print(f"Page dirs: {len(list(OUTPUT_DIR.glob('page_*')))}")
+    total_dirs = len([d for d in OUTPUT_DIR.glob("page_*")
+                      if d.is_dir() and d.name not in ("restructured", "smoke_test")])
+    print(f"Page dirs: {total_dirs}")
 
 
 if __name__ == "__main__":

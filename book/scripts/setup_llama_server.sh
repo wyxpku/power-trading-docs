@@ -12,16 +12,16 @@ fi
 
 echo ""
 echo "=== Step 2: Download GGUF model ==="
-MODEL_DIR="$HOME/models/PaddleOCR-VL-1.5-GGUF"
+MODEL_DIR="$HOME/models/PaddleOCR-VL-1.6-GGUF"
 mkdir -p "$MODEL_DIR"
 
-if [ -f "$MODEL_DIR/PaddleOCR-VL-1.5.gguf" ]; then
+if [ -f "$MODEL_DIR/PaddleOCR-VL-1.6-GGUF.gguf" ]; then
     echo "Model already exists at $MODEL_DIR"
 else
     echo "Installing huggingface-cli..."
     pip install huggingface_hub
-    echo "Downloading PaddleOCR-VL-1.5 GGUF model (may take several minutes)..."
-    huggingface-cli download PaddlePaddle/PaddleOCR-VL-1.5-GGUF --local-dir "$MODEL_DIR"
+    echo "Downloading PaddleOCR-VL-1.6 GGUF model (may take several minutes)..."
+    hf download PaddlePaddle/PaddleOCR-VL-1.6-GGUF --local-dir "$MODEL_DIR"
     echo "Download complete."
 fi
 
@@ -34,8 +34,8 @@ echo "=== Setup Complete ==="
 echo ""
 echo "To START the llama-server (run in a separate terminal):"
 echo "  llama-server \\"
-echo "    -m $MODEL_DIR/PaddleOCR-VL-1.5.gguf \\"
-echo "    --mmproj $MODEL_DIR/PaddleOCR-VL-1.5-mmproj.gguf \\"
+echo "    -m $MODEL_DIR/PaddleOCR-VL-1.6-GGUF.gguf \\"
+echo "    --mmproj $MODEL_DIR/PaddleOCR-VL-1.6-GGUF-mmproj.gguf \\"
 echo "    --port 8080 --host 0.0.0.0 --temp 0"
 echo ""
 echo "Then run the conversion with:"
