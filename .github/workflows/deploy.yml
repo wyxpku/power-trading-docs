@@ -34,8 +34,8 @@ jobs:
 
       - name: Create symlink for page scans
         run: |
-          mkdir -p book-vitepress/public
-          ln -s ../book/pages book-vitepress/public/pages
+          rm -f book-vitepress/public/pages
+          ln -s ../../book/pages book-vitepress/public/pages
 
       - name: Build
         run: npm run docs:build
