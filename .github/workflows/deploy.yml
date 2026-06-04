@@ -26,25 +26,25 @@ jobs:
         with:
           node-version: 20
           cache: npm
-          cache-dependency-path: book-vitepress/package-lock.json
+          cache-dependency-path: site/package-lock.json
 
       - name: Install dependencies
         run: npm ci
-        working-directory: book-vitepress
+        working-directory: site
 
       - name: Create symlink for page scans
         run: |
-          rm -f book-vitepress/public/pages
-          ln -s ../../book/pages book-vitepress/public/pages
+          rm -f site/public/pages
+          ln -s ../../assets/pages site/public/pages
 
       - name: Build
         run: npm run docs:build
-        working-directory: book-vitepress
+        working-directory: site
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: book-vitepress/.vitepress/dist
+          path: site/.vitepress/dist
 
   deploy:
     environment:
