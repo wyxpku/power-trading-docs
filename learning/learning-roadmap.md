@@ -2,7 +2,7 @@
 
 > **Domain mode:** professional（工作需要）
 > **Total:** 33 章节单元 | 6 个学习集群
-> **Progress:** 1 / 33（第1章完成 ✅）
+> **Progress:** 2 / 33（第1章完成 ✅，第2章 Pass 1 完成 ✅）
 
 ---
 
@@ -13,7 +13,8 @@
 - [x] [[ch01-电力市场概述]]（概念：电力市场总体架构、电能量与辅助服务市场关系、集中式vs分散式模式、输电权与容量市场、现货市场形态与特性、交易流程、建设路径与国际经验）
     - [[learning/protocols/2026-06-12_ch01-电力市场概述|protocol 1]]（首次，partial）
     - [[learning/protocols/2026-06-15_ch01-电力市场概述-续|protocol 2]]（续，completed）
-- [ ] [[ch02-电力现货市场组织]]
+- [x] [[ch02-电力现货市场组织]]
+    - [[learning/protocols/2026-06-16_ch02-电力现货市场组织|protocol]]（Pass 1 完成，comprehension: partial）
 - [ ] [[ch03-电力现货市场价格机制]]
 - [ ] [[ch04-电力现货市场阻塞管理]]
 - [ ] [[ch05-电力市场信息披露与风险管控]]
