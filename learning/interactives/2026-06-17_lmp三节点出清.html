@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>节点边际电价 (LMP) 三节点出清交互演示</title>
+<link rel="stylesheet" href="interactive.css">
+<style>
+  /* Network diagram styles */
+  .node-circle { stroke-width: 2; }
+  .node-label { font: 700 13px sans-serif; fill: var(--text); }
+  .gen-label { font: 600 11px sans-serif; fill: var(--text); }
+  .lmp-label { font: 700 15px sans-serif; }
+  .line-label { font: 600 10px sans-serif; fill: var(--text-muted); }
+  .small-label { font: 11px sans-serif; fill: var(--text-muted); }
+
+  /* Merit order chart */
+  .chart-axis { stroke: var(--border); stroke-width: 1; }
+  .chart-axis-label { font: 10px sans-serif; fill: var(--text-muted); }
+  .chart-block { stroke: #fff; stroke-width: 1; }
+  .chart-line { stroke: var(--accent); stroke-width: 2; stroke-dasharray: 4,3; }
+  .chart-dot { fill: var(--accent); }
+
+  .lmp-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 13px;
+  }
+
+  .legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-right: 12px;
+  }
+  .legend-swatch {
+    width: 14px; height: 3px; border-radius: 2px;
+  }
+
+  .congested { color: var(--red); }
+  .free { color: var(--green); }
+</style>
+</head>
+<body>
+
+<div class="layout">
+  <!-- ============ SIDEBAR: CONTROLS ============ -->
+  <div class="sidebar">
+    <div class="panel">
+      <h1>节点边际电价 LMP</h1>
+      <p style="color:var(--text-muted); font-size:12px;">三节点输电网络出清演示</p>
+    </div>
+
+    <div class="panel">
+      <div class="section-title">控制参数</div>
+
+      <div class="slider-row">
+        <label class="slider-label">负荷（节点3）<span class="slider-val" id="loadVal">10000 MW</span></label>
+        <input type="range" id="loadSlider" min="5000" max="12000" step="500" value="10000">
+      </div>
+
+      <div class="slider-row">
+        <label class="slider-label">线路容量限制<span class="slider-val" id="lineVal">8000 MW</span></label>
+        <input type="range" id="lineSlider" min="2000" max="8000" step="500" value="8000">
+      </div>
+
+      <div class="slider-row">
+        <label class="slider-label">G3 报价<span class="slider-val" id="g3Val">400 元/MWh</span></label>
+        <input type="range" id="g3Slider" min="200" max="800" step="50" value="400">
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="section-title">预设场景</div>
+      <div class="preset-row">
+        <button class="preset-btn" data-load="7500" data-line="8000" data-g3="400">无阻塞·低谷</button>
+        <button class="preset-btn" data-load="10000" data-line="8000" data-g3="400">无阻塞·高峰</button>
+        <button class="preset-btn" data-load="7500" data-line="3500" data-g3="400">阻塞·低谷</button>
+        <button class="preset-btn" data-load="10000" data-line="8000" data-g3="800">市场力·哄抬</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="section-title">学习提示</div>
+      <div class="prompt-box">调节"负荷"滑块，观察边际机组如何从G1切换到G3——价格由最后一台满足负荷的机组决定</div>
+      <div class="prompt-box">调节"线路容量"滑块至3500MW，观察节点3价格如何与其他节点分化——这就是阻塞的经济信号</div>
+      <div class="prompt-box">调节"G3报价"至800元，观察高峰时段价格如何被抬高——这就是需要市场力监管的原因</div>
+    </div>
+  </div>
+
+  <!-- ============ MAIN: VISUALIZATIONS ============ -->
+  <div class="main">
+
+    <!-- NETWORK DIAGRAM -->
+    <div class="panel">
+      <div class="section-title">三节点输电网络</div>
+      <svg id="networkSvg" width="560" height="400" viewBox="0 0 560 400"></svg>
+
+      <div style="margin-top:8px;">
+        <span class="legend-item"><span class="legend-swatch" style="background:var(--green);"></span> 线路畅通</span>
+        <span class="legend-item"><span class="legend-swatch" style="background:var(--red);"></span> 线路阻塞</span>
+        <span class="legend-item"><span class="legend-swatch" style="background:var(--accent);"></span> 输电线路</span>
+      </div>
+    </div>
+
+    <!-- METRICS ROW -->
+    <div class="panel">
+      <div class="section-title">出清结果</div>
+      <div class="metric-row">
+        <div class="metric">
+          <div class="label">G1 出力</div>
+          <div class="value" id="g1Output" style="color:var(--accent);">—</div>
+        </div>
+        <div class="metric">
+          <div class="label">G2 出力</div>
+          <div class="value" id="g2Output" style="color:var(--accent);">—</div>
+        </div>
+        <div class="metric">
+          <div class="label">G3 出力</div>
+          <div class="value" id="g3Output" style="color:var(--accent);">—</div>
+        </div>
+        <div class="metric">
+          <div class="label">系统状态</div>
+          <div class="value" id="systemStatus" style="font-size:14px; margin-top:6px;">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MERIT ORDER CURVE -->
+    <div class="panel">
+      <div class="section-title"> merit order 曲线（供电排序）</div>
+      <svg id="meritSvg" width="600" height="220" viewBox="0 0 600 220"></svg>
+    </div>
+
+    <!-- EXPLANATION -->
+    <div class="panel">
+      <div class="section-title">动态解释</div>
+      <div id="explainBox" class="explain">—</div>
+      <div id="marketPowerBox" style="display:none;" class="explain danger">—</div>
+    </div>
+
+    <!-- FORMULAS -->
+    <div class="panel">
+      <div class="section-title">出清原理</div>
+      <div class="formula">
+        经济调度：按报价从低到高排序 (merit order)，依次调用<br>
+        G1 (160元) → G2 (400元) → G3 (报价可调)<br>
+        无阻塞时：系统边际价格 = 边际机组报价<br>
+        有阻塞时：各节点 LMP = 该节点满足微增负荷的边际机组报价
+      </div>
+      <div class="notice">
+        <strong>LMP 的本质：</strong>每个节点的电价反映了在该节点供应"多1 MW"电力所需的成本。
+        当输电线路拥堵时，便宜的电无法送达，负荷中心只能依靠本地昂贵机组，价格因此分化。
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ============================================================
+//  3-NODE LMP CLEARING MODEL
+// ============================================================
+
+const MODEL = {
+  // Generators
+  g1: { name: 'G1', node: 1, offer: 160, capMin: 0, capMax: 8000 },
+  g2: { name: 'G2', node: 2, offer: 400, capMin: 0, capMax: 1500 },
+  g3: { name: 'G3', node: 3, offer: 400, capMin: 0, capMax: 8000 },
+  // Network: triangle, node 3 is load node
+  // Line limits are symmetric and adjustable
+};
+
+// DOM refs
+const loadSlider = document.getElementById('loadSlider');
+const lineSlider = document.getElementById('lineSlider');
+const g3Slider   = document.getElementById('g3Slider');
+const loadVal    = document.getElementById('loadVal');
+const lineVal    = document.getElementById('lineVal');
+const g3Val      = document.getElementById('g3Val');
+const explainBox = document.getElementById('explainBox');
+const marketPowerBox = document.getElementById('marketPowerBox');
+
+// ============================================================
+//  CLEARING LOGIC
+// ============================================================
+function runClearing(load, lineCap, g3Offer) {
+  // Simple DC power flow approximation for teaching:
+  // Triangle network: nodes 1-2, 1-3, 2-3
+  // Node 3 is the only load. Generators at nodes 1, 2, 3.
+  // Power flows from node 1 and node 2 to node 3.
+  // In a symmetric 3-node triangle with equal reactance:
+  //   If G1 outputs P1 and G2 outputs P2, the flows to node 3 split roughly:
+  //   Line 1→3 carries ~2/3 of P1 (direct path) and Line 1→2→3 carries ~1/3
+  //   Similarly for G2: Line 2→3 carries ~2/3, Line 2→1→3 carries ~1/3
+  //
+  // Simplified PTDF model (equal reactance on all lines):
+  //   Flow on line(i,j) due to injection at node k = PTDF
+  //   For 3-node triangle with node 3 as sink:
+  //     Injection at node 1: 2/3 flows on line 1-3, 1/3 on line 1-2
+  //     Injection at node 2: 2/3 flows on line 2-3, 1/3 on line 2-1(=1-2)
+  //
+  // Dispatch: cheapest first, subject to line constraints.
+  // 1. Dispatch G1 (cheapest at 160), up to capacity and line limits
+  // 2. Dispatch G2 (next at 400), up to capacity and line limits
+  // 3. Dispatch G3 (marginal, at g3Offer), fills remaining load
+
+  // Start with all G1 (cheapest), then check constraints
+  let p1 = Math.min(MODEL.g1.capMax, load);
+  let p2 = 0;
+  let p3 = load - p1;
+
+  // Check line limits with G1-only dispatch
+  // Line 1-3 flow: 2/3 * p1
+  // Line 1-2 flow: 1/3 * p1 (this also = line 2-3 flow contribution from G1 indirectly)
+  // Line 2-3 flow: 2/3 * p1 (from G1 via node 2? No—G1 injects at node 1)
+  //
+  // Actually in this simple model: all load at node 3.
+  // G1 at node 1: 2/3 of p1 flows on line 1-3, 1/3 flows via line 1-2 then 2-3
+  //   So line 1-3: 2/3*p1, line 1-2: 1/3*p1, line 2-3: 1/3*p1
+  // G2 at node 2: 2/3 of p2 flows on line 2-3, 1/3 flows via line 2-1 then 1-3
+  //   So line 2-3: +2/3*p2, line 1-2: +1/3*p2 (reverse dir), line 1-3: +1/3*p2
+  // G3 at node 3: all p3 consumed locally, no line flow
+
+  // We need to check: does dispatching G1 alone violate line 1-3 limit?
+  // Line 1-3 flow = 2/3 * p1
+  // If 2/3 * p1 > lineCap → congestion, need to back down G1, ramp up G3 or G2
+
+  let congested = false;
+  let congestedLines = [];
+
+  function checkFlows(p1, p2, p3) {
+    // All flows are absolute values
+    // Line 1-3: from G1 (2/3*p1 forward) + from G2 via 2-1-3 path (1/3*p2 forward)
+    var f13 = (2/3)*p1 + (1/3)*p2;
+    // Line 2-3: from G1 via 1-2-3 path (1/3*p1 forward) + from G2 (2/3*p2 forward)
+    var f23 = (1/3)*p1 + (2/3)*p2;
+    // Line 1-2: from G1 (1/3*p1 forward to node2) - from G2 (1/3*p2 to node1)
+    // These flow in opposite directions on line 1-2, so net flow:
+    var f12 = Math.abs((1/3)*p1 - (1/3)*p2);
+    return { f13: f13, f23: f23, f12: f12 };
+  }
+
+  var flows = checkFlows(p1, p2, p3);
+
+  // If G1-only dispatch violates line 1-3 limit, reduce G1 and increase G3
+  // (G2 is also at node 2, helps a little but has only 1500MW capacity)
+  if (flows.f13 > lineCap) {
+    congested = true;
+    // Max G1 output such that 2/3 * p1 <= lineCap → p1 <= 1.5 * lineCap
+    // But also need to check line 2-3 after dispatching G2
+    // Try: use G2 first (it's at node 2, which has better PTDF to node 3 via line 2-3)
+    // Actually both G1 and G2 use line 2-3, so dispatching G2 also risks line 2-3
+
+    // Simplified: limit G1 so that line 1-3 not overloaded
+    // 2/3 * p1 + 1/3 * p2 <= lineCap
+    // First dispatch G2 up to its capacity (1500MW) since G1 is already maxed at the constraint
+    // Try to use as much G1 as possible (cheapest)
+
+    // p1 constrained by: 2/3*p1 + 1/3*p2 <= lineCap
+    // If p2 = 0: p1 <= 1.5*lineCap
+    // Use G1 up to min(8000, 1.5*lineCap), then use G2 up to min(1500, remaining), then G3
+
+    p1 = Math.min(MODEL.g1.capMax, 1.5 * lineCap, load);
+    var remaining = load - p1;
+    p2 = Math.min(MODEL.g2.capMax, remaining);
+
+    // Check if dispatching G2 violates line 2-3
+    flows = checkFlows(p1, p2, 0);
+    if (flows.f23 > lineCap) {
+      // Limit G2 so that line 2-3 not overloaded: 1/3*p1 + 2/3*p2 <= lineCap
+      var maxP2 = Math.max(0, 1.5 * lineCap - 0.5 * p1);
+      p2 = Math.min(p2, maxP2);
+    }
+
+    remaining = load - p1 - p2;
+    p3 = remaining;
+    congested = true;
+  }
+
+  flows = checkFlows(p1, p2, p3);
+
+  // Determine congested lines
+  congestedLines = [];
+  if (flows.f13 > lineCap - 0.5) congestedLines.push('1-3');
+  if (flows.f23 > lineCap - 0.5) congestedLines.push('2-3');
+  if (flows.f12 > lineCap - 0.5) congestedLines.push('1-2');
+
+  congested = congestedLines.length > 0;
+
+  // Determine LMPs
+  // No congestion: all nodes have the same price = marginal generator's offer
+  // Congestion: node prices diverge based on which generator serves incremental load at each node
+  //
+  // In our model:
+  // - If no congestion: marginal generator = the last one dispatched
+  // - If congestion:
+  //   Node 1 & 2: G1 is still available (has spare capacity if constrained),
+  //               so incremental load at node 1/2 is served by G1 → LMP = 160
+  //   Node 3: G1 can't send more power (line full), so G3 serves incremental load → LMP = g3Offer
+
+  var lmp1, lmp2, lmp3;
+  var marginalGen;
+  var g3IsMarginal = (p3 > 0);
+
+  if (!congested) {
+    // No congestion: uniform price = marginal generator
+    if (p3 > 0) {
+      // G3 is marginal
+      lmp1 = lmp2 = lmp3 = g3Offer;
+      marginalGen = 'G3';
+    } else if (p2 > 0) {
+      // G2 is marginal (unlikely given capacities, but handle it)
+      lmp1 = lmp2 = lmp3 = MODEL.g2.offer;
+      marginalGen = 'G2';
+    } else {
+      // Only G1 dispatched (low load, all served by G1)
+      lmp1 = lmp2 = lmp3 = MODEL.g1.offer;
+      marginalGen = 'G1';
+    }
+  } else {
+    // Congestion: node prices diverge
+    // Node 1 and 2: G1 serves incremental load (G1 has spare capacity when congested)
+    // Node 3: G3 serves incremental load
+    lmp1 = MODEL.g1.offer;   // 160
+    lmp2 = MODEL.g1.offer;   // 160 (G1 can serve node 2 via line 1-2 which has capacity)
+    // But wait: if node 2 incremental load needs to come from G1 via line 1-2,
+    // and line 1-2 might also be constrained. For simplicity, if line 1-2 is not congested,
+    // node 2 LMP = G1 price. If it is, node 2 LMP = G2 price (400).
+    if (congestedLines.indexOf('1-2') >= 0) {
+      lmp2 = MODEL.g2.offer;  // 400
+    }
+    lmp3 = g3Offer;
+    marginalGen = 'G3 (node 3)';
+  }
+
+  // Check for market power signal
+  var marketPower = (g3Offer > 500 && g3IsMarginal);
+
+  return {
+    p1: p1, p2: p2, p3: p3,
+    flows: flows,
+    lineCap: lineCap,
+    congested: congested,
+    congestedLines: congestedLines,
+    lmp1: lmp1, lmp2: lmp2, lmp3: lmp3,
+    marginalGen: marginalGen,
+    load: load,
+    g3Offer: g3Offer,
+    marketPower: marketPower,
+    uniformPrice: (lmp1 === lmp2 && lmp2 === lmp3)
+  };
+}
+
+// ============================================================
+//  RENDERING
+// ============================================================
+function updateSliderDisplay() {
+  loadVal.textContent = loadSlider.value + ' MW';
+  lineVal.textContent = lineSlider.value + ' MW';
+  g3Val.textContent   = g3Slider.value + ' 元/MWh';
+}
+
+function renderNetwork(r) {
+  var svg = document.getElementById('networkSvg');
+  svg.innerHTML = '';
+
+  var ns = 'http://www.w3.org/2000/svg';
+
+  // Node positions (triangle)
+  // Node 1: left, Node 2: right-top, Node 3: bottom center (load)
+  var n1 = {x: 120, y: 100};
+  var n2 = {x: 440, y: 100};
+  var n3 = {x: 280, y: 320};
+
+  // Helper to create SVG elements
+  function el(tag, attrs) {
+    var e = document.createElementNS(ns, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+
+  // --- Draw transmission lines ---
+  // Line 1-2
+  var congested12 = r.congestedLines.indexOf('1-2') >= 0;
+  var line12Color = congested12 ? '#dc2626' : '#94a3b8';
+  var line12Width = congested12 ? 4 : 2.5;
+  svg.appendChild(el('line', {x1:n1.x, y1:n1.y, x2:n2.x, y2:n2.y,
+    stroke: line12Color, 'stroke-width': line12Width}));
+
+  // Flow label for 1-2
+  var mid12 = {x: (n1.x+n2.x)/2, y: (n1.y+n2.y)/2 - 12};
+  svg.appendChild(el('text', {x:mid12.x, y:mid12.y, 'text-anchor':'middle',
+    class:'line-label', fill: congested12 ? '#dc2626' : '#64748b'}))
+    .textContent = 'F₁₂=' + Math.round(r.flows.f12) + 'MW';
+
+  // Line 1-3
+  var congested13 = r.congestedLines.indexOf('1-3') >= 0;
+  var line13Color = congested13 ? '#dc2626' : '#16a34a';
+  var line13Width = congested13 ? 4 : 2.5;
+  svg.appendChild(el('line', {x1:n1.x, y1:n1.y, x2:n3.x, y2:n3.y,
+    stroke: line13Color, 'stroke-width': line13Width}));
+
+  var mid13 = {x: (n1.x+n3.x)/2 - 35, y: (n1.y+n3.y)/2 + 15};
+  svg.appendChild(el('text', {x:mid13.x, y:mid13.y, 'text-anchor':'middle',
+    class:'line-label', fill: congested13 ? '#dc2626' : '#16a34a'}))
+    .textContent = 'F₁₃=' + Math.round(r.flows.f13) + 'MW';
+
+  // Line 2-3
+  var congested23 = r.congestedLines.indexOf('2-3') >= 0;
+  var line23Color = congested23 ? '#dc2626' : '#16a34a';
+  var line23Width = congested23 ? 4 : 2.5;
+  svg.appendChild(el('line', {x1:n2.x, y1:n2.y, x2:n3.x, y2:n3.y,
+    stroke: line23Color, 'stroke-width': line23Width}));
+
+  var mid23 = {x: (n2.x+n3.x)/2 + 35, y: (n2.y+n3.y)/2 + 15};
+  svg.appendChild(el('text', {x:mid23.x, y:mid23.y, 'text-anchor':'middle',
+    class:'line-label', fill: congested23 ? '#dc2626' : '#16a34a'}))
+    .textContent = 'F₂₃=' + Math.round(r.flows.f23) + 'MW';
+
+  // Line capacity label
+  svg.appendChild(el('text', {x: 280, y: 390, 'text-anchor':'middle',
+    class:'small-label'}))
+    .textContent = '线路容量限制: ' + r.lineCap + ' MW / 条';
+
+  // --- Draw nodes ---
+  function drawNode(cx, cy, label, genName, genOutput, genCap, offerPrice, lmp, isLoad, loadVal) {
+    // Node circle
+    var fillColor = isLoad ? '#fef3c7' : '#eff6ff';
+    var strokeColor = isLoad ? '#f59e0b' : '#2563eb';
+    svg.appendChild(el('circle', {cx:cx, cy:cy, r:32,
+      fill: fillColor, stroke: strokeColor, 'stroke-width': 2, class:'node-circle'}));
+
+    // Node label
+    svg.appendChild(el('text', {x:cx, y:cy-5, 'text-anchor':'middle', class:'node-label'}))
+      .textContent = label;
+
+    // Generator name
+    if (genName) {
+      svg.appendChild(el('text', {x:cx, y:cy+10, 'text-anchor':'middle', class:'gen-label'}))
+        .textContent = genName;
+    }
+
+    // Output / capacity below node
+    var outY = cy + 50;
+    if (isLoad) {
+      svg.appendChild(el('text', {x:cx, y:outY, 'text-anchor':'middle', class:'gen-label', fill:'#92400e'}))
+        .textContent = '负荷 ' + loadVal + ' MW';
+    } else {
+      svg.appendChild(el('text', {x:cx, y:outY, 'text-anchor':'middle', class:'gen-label'}))
+        .textContent = genName + ': ' + Math.round(genOutput) + '/' + genCap + ' MW';
+      svg.appendChild(el('text', {x:cx, y:outY+14, 'text-anchor':'middle', class:'small-label'}))
+        .textContent = '报价 ' + offerPrice + ' 元';
+    }
+
+    // LMP price badge
+    var lmpY = cy - 48;
+    var lmpColor = lmp > 500 ? '#dc2626' : (lmp > 300 ? '#f59e0b' : '#16a34a');
+    // Badge background
+    var badgeW = 70, badgeH = 20;
+    svg.appendChild(el('rect', {x: cx - badgeW/2, y: lmpY - 14,
+      width: badgeW, height: badgeH, rx: 4,
+      fill: lmpColor, opacity: 0.12}));
+    svg.appendChild(el('text', {x:cx, y:lmpY, 'text-anchor':'middle', class:'lmp-label', fill: lmpColor}))
+      .textContent = lmp + ' 元';
+
+    // Output bar (mini bar chart on the node)
+    if (!isLoad && genCap > 0) {
+      var barW = 50, barH = 5;
+      var barX = cx - barW/2, barY = cy + 26;
+      svg.appendChild(el('rect', {x:barX, y:barY, width:barW, height:barH,
+        fill:'#e2e8f0', rx:2}));
+      var fillW = (genOutput / genCap) * barW;
+      svg.appendChild(el('rect', {x:barX, y:barY, width:fillW, height:barH,
+        fill:'#2563eb', rx:2}));
+    }
+  }
+
+  // Node 1: G1
+  drawNode(n1.x, n1.y, '节点1', 'G1', r.p1, MODEL.g1.capMax, MODEL.g1.offer, r.lmp1, false);
+  // Node 2: G2
+  drawNode(n2.x, n2.y, '节点2', 'G2', r.p2, MODEL.g2.capMax, MODEL.g2.offer, r.lmp2, false);
+  // Node 3: G3 + Load
+  drawNode(n3.x, n3.y, '节点3', 'G3', r.p3, MODEL.g3.capMax, r.g3Offer, r.lmp3, true, r.load);
+
+  // G3 output text for node 3 (since it shows load)
+  svg.appendChild(el('text', {x:n3.x, y:n3.y+64, 'text-anchor':'middle', class:'gen-label'}))
+    .textContent = 'G3: ' + Math.round(r.p3) + '/' + MODEL.g3.capMax + ' MW (' + r.g3Offer + '元)';
+}
+
+function renderMeritOrder(r) {
+  var svg = document.getElementById('meritSvg');
+  svg.innerHTML = '';
+
+  var ns = 'http://www.w3.org/2000/svg';
+  function el(tag, attrs) {
+    var e = document.createElementNS(ns, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+
+  // Chart dimensions
+  var margin = {top: 20, right: 30, bottom: 40, left: 50};
+  var W = 600, H = 220;
+  var cw = W - margin.left - margin.right;
+  var ch = H - margin.top - margin.bottom;
+  var x0 = margin.left, y0 = margin.top;
+
+  // X axis: 0 to 20000 MW (total capacity = 8000+1500+8000 = 17500, round to 20000)
+  var xMax = 20000;
+  // Y axis: 0 to max offer (800)
+  var yMax = 850;
+
+  function xScale(mw) { return x0 + (mw / xMax) * cw; }
+  function yScale(price) { return y0 + ch - (price / yMax) * ch; }
+
+  // Axes
+  svg.appendChild(el('line', {x1:x0, y1:y0+ch, x2:x0+cw, y2:y0+ch, class:'chart-axis'}));
+  svg.appendChild(el('line', {x1:x0, y1:y0, x2:x0, y2:y0+ch, class:'chart-axis'}));
+
+  // X-axis labels
+  var xTicks = [0, 5000, 10000, 15000, 20000];
+  for (var i = 0; i < xTicks.length; i++) {
+    var tx = xScale(xTicks[i]);
+    svg.appendChild(el('text', {x:tx, y:y0+ch+16, 'text-anchor':'middle', class:'chart-axis-label'}))
+      .textContent = xTicks[i] >= 1000 ? (xTicks[i]/1000) + 'k' : xTicks[i];
+  }
+  svg.appendChild(el('text', {x:x0+cw/2, y:y0+ch+34, 'text-anchor':'middle', class:'chart-axis-label'}))
+    .textContent = '出力 (MW)';
+
+  // Y-axis labels
+  var yTicks = [0, 200, 400, 600, 800];
+  for (var i = 0; i < yTicks.length; i++) {
+    var ty = yScale(yTicks[i]);
+    svg.appendChild(el('text', {x:x0-6, y:ty+3, 'text-anchor':'end', class:'chart-axis-label'}))
+      .textContent = yTicks[i];
+  }
+  svg.appendChild(el('text', {x:x0-40, y:y0+ch/2, 'text-anchor':'middle', class:'chart-axis-label',
+    transform:'rotate(-90 ' + (x0-40) + ' ' + (y0+ch/2) + ')'}))
+    .textContent = '报价 (元/MWh)';
+
+  // Merit order blocks: G1 (0-8000, 160), G2 (8000-9500, 400), G3 (9500-17500, g3Offer)
+  var blocks = [
+    {start: 0,    end: 8000,  price: MODEL.g1.offer, color: '#3b82f6', label: 'G1'},
+    {start: 8000, end: 9500,  price: MODEL.g2.offer, color: '#8b5cf6', label: 'G2'},
+    {start: 9500, end: 17500, price: r.g3Offer,      color: '#ef4444', label: 'G3'}
+  ];
+
+  for (var i = 0; i < blocks.length; i++) {
+    var b = blocks[i];
+    var bx = xScale(b.start);
+    var bw = xScale(b.end) - xScale(b.start);
+    var by = yScale(b.price);
+    var bh = yScale(0) - by;
+
+    // Block fill
+    svg.appendChild(el('rect', {x:bx, y:by, width:bw, height:bh,
+      fill:b.color, opacity:0.25, class:'chart-block', stroke:b.color, 'stroke-width':1}));
+
+    // Label
+    var labelX = bx + bw/2;
+    var labelY = by + bh/2 + 4;
+    if (bw > 25) {
+      svg.appendChild(el('text', {x:labelX, y:labelY, 'text-anchor':'middle',
+        class:'chart-axis-label', 'font-weight':'700', fill:b.color}))
+        .textContent = b.label;
+    }
+  }
+
+  // Horizontal lines for each price level
+  svg.appendChild(el('line', {x1:xScale(0), y1:yScale(160), x2:xScale(8000), y2:yScale(160),
+    stroke:'#3b82f6', 'stroke-width':2}));
+  svg.appendChild(el('line', {x1:xScale(8000), y1:yScale(400), x2:xScale(9500), y2:yScale(400),
+    stroke:'#8b5cf6', 'stroke-width':2}));
+  svg.appendChild(el('line', {x1:xScale(9500), y1:yScale(r.g3Offer), x2:xScale(17500), y2:yScale(r.g3Offer),
+    stroke:'#ef4444', 'stroke-width':2}));
+
+  // Vertical line at current load
+  var loadX = xScale(r.load);
+  svg.appendChild(el('line', {x1:loadX, y1:y0, x2:loadX, y2:y0+ch,
+    stroke:'#1e293b', 'stroke-width':2, 'stroke-dasharray':'4,3'}));
+
+  // Load label
+  svg.appendChild(el('text', {x:loadX, y:y0-6, 'text-anchor':'middle',
+    class:'chart-axis-label', 'font-weight':'700', fill:'#1e293b'}))
+    .textContent = '负荷=' + r.load;
+
+  // Marginal price dot
+  var marginalPrice;
+  if (r.load <= 8000) marginalPrice = MODEL.g1.offer;
+  else if (r.load <= 9500) marginalPrice = MODEL.g2.offer;
+  else marginalPrice = r.g3Offer;
+
+  svg.appendChild(el('circle', {cx:loadX, cy:yScale(marginalPrice), r:5,
+    fill:'#1e293b', stroke:'#fff', 'stroke-width':2}));
+  svg.appendChild(el('text', {x:loadX+8, y:yScale(marginalPrice)-8,
+    class:'chart-axis-label', 'font-weight':'700'}))
+    .textContent = marginalPrice + '元';
+}
+
+function renderExplanation(r) {
+  // Main explanation
+  var html = '';
+  if (!r.congested) {
+    var genLabel = r.marginalGen;
+    var price = r.lmp3; // uniform
+    html = '<strong>无阻塞：</strong>全网统一价 <span class="lmp-badge" style="background:#dbeafe;color:#1e40af;">' + price + ' 元/MWh</span>（边际机组：' + genLabel + '）';
+    html += '<br><span style="color:var(--text-muted);font-size:12px;">G1=' + Math.round(r.p1) + 'MW, G2=' + Math.round(r.p2) + 'MW, G3=' + Math.round(r.p3) + 'MW，总负荷' + r.load + 'MW由最便宜的可用机组满足，输电线路无瓶颈。</span>';
+    explainBox.className = 'explain';
+  } else {
+    html = '<strong style="color:#dc2626;">检测到阻塞！</strong> 线路 [' + r.congestedLines.join(', ') + '] 达到容量上限';
+    html += '<br>节点1 = <strong>' + r.lmp1 + '元</strong>，节点2 = <strong>' + r.lmp2 + '元</strong>，节点3 = <strong style="color:#dc2626;">' + r.lmp3 + '元</strong>';
+    html += '<br><span style="color:var(--text-muted);font-size:12px;">便宜的电（G1，160元）因线路容量受限无法送达负荷中心（节点3），节点3只能依靠本地机组G3供电，价格因此分化。这就是LMP的核心——不同位置的电价不同。</span>';
+    explainBox.className = 'explain warning';
+  }
+  explainBox.innerHTML = html;
+
+  // Market power warning
+  if (r.marketPower) {
+    marketPowerBox.style.display = 'block';
+    marketPowerBox.innerHTML = '<strong>⚠️ 市场力信号：</strong>G3报价被抬高至 <strong>' + r.g3Offer + ' 元</strong>，高峰时段系统电价被拉高至 <strong>' + r.g3Offer + ' 元/MWh</strong>。G3作为边际机组，其报价直接决定了全系统（或阻塞区）的价格水平——这就是需要市场力监管的原因。';
+  } else {
+    marketPowerBox.style.display = 'none';
+  }
+}
+
+function renderMetrics(r) {
+  document.getElementById('g1Output').textContent = Math.round(r.p1);
+  document.getElementById('g2Output').textContent = Math.round(r.p2);
+  document.getElementById('g3Output').textContent = Math.round(r.p3);
+
+  var status = document.getElementById('systemStatus');
+  if (r.congested) {
+    status.textContent = '阻塞';
+    status.style.color = '#dc2626';
+  } else {
+    status.textContent = '畅通';
+    status.style.color = '#16a34a';
+  }
+}
+
+// ============================================================
+//  MAIN UPDATE FUNCTION
+// ============================================================
+function update() {
+  updateSliderDisplay();
+
+  var load = parseInt(loadSlider.value);
+  var lineCap = parseInt(lineSlider.value);
+  var g3Offer = parseInt(g3Slider.value);
+
+  var result = runClearing(load, lineCap, g3Offer);
+
+  renderNetwork(result);
+  renderMeritOrder(result);
+  renderMetrics(result);
+  renderExplanation(result);
+
+  // Clear active preset highlight if values don't match
+  document.querySelectorAll('.preset-btn').forEach(function(btn) {
+    btn.classList.remove('active');
+  });
+}
+
+// ============================================================
+//  EVENT LISTENERS
+// ============================================================
+loadSlider.addEventListener('input', update);
+lineSlider.addEventListener('input', update);
+g3Slider.addEventListener('input', update);
+
+document.querySelectorAll('.preset-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    loadSlider.value = btn.dataset.load;
+    lineSlider.value = btn.dataset.line;
+    g3Slider.value   = btn.dataset.g3;
+
+    document.querySelectorAll('.preset-btn').forEach(function(b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+
+    update();
+  });
+});
+
+// Initial render
+update();
+</script>
+
+</body>
+</html>
