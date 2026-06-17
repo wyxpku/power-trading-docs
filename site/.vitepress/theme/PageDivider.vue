@@ -1,10 +1,10 @@
 <template>
-  <div
+  <span
     class="page-divider"
     :id="'page-div-' + pdfPage"
     :data-page="pdfPage"
   >
-  </div>
+  </span>
 </template>
 
 <script setup lang="ts">
