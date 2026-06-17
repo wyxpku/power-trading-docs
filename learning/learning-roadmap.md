@@ -2,7 +2,7 @@
 
 > **Domain mode:** professional（工作需要）
 > **Total:** 33 章节单元 | 6 个学习集群
-> **Progress:** 4 / 33（第1-4章 Pass 1 完成 ✅）
+> **Progress:** 5 / 33（第1-5章 Pass 1 完成 ✅）
 
 ---
 
@@ -19,7 +19,8 @@
     - [[learning/protocols/2026-06-17_ch03-电力现货市场价格机制|protocol]]（Pass 1 完成，comprehension: partial，多轮讲解后掌握）
 - [x] [[ch04-电力现货市场阻塞管理]]
     - [[learning/protocols/2026-06-17_ch04-电力现货市场阻塞管理|protocol]]（Pass 1 完成，comprehension: partial）
-- [ ] [[ch05-电力市场信息披露与风险管控]]
+- [x] [[ch05-电力市场信息披露与风险管控]]
+    - [[learning/protocols/2026-06-17_ch05-电力市场信息披露与风险管控|protocol]]（Pass 1 完成，comprehension: partial）
 - [ ] [[ch06-电力现货市场绩效评价]]
 
 ## Cluster 2: 国外典型电力市场（第7-12章）
