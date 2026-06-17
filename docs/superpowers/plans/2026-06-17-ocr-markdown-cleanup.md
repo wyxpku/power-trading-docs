@@ -263,6 +263,89 @@
 
 ---
 
+## Task 4.5: D 类章节边界修复 — ch12 → ch13（试点）
+
+**Files:**
+- Modify: `site/ch12/index.md`（删除末尾 28 行 ch13 内容）
+- Modify: `site/ch13/index.md`（在 frontmatter 后插入这 28 行）
+
+**说明**：D 类问题在试点过程中发现（spec §3.4）。本任务用 ch12→ch13 边界跑通 D 类流程，作为试点的一部分。详见 spec §3.4 的错位边界清单。
+
+**已知错位**：ch12 文件 L422-449 是 ch13 的开头内容，包括：
+- `<PageDivider pdf-page="247" />` + `# 第三篇 国内实践篇`
+- `<PageDivider pdf-page="248" />` + `## 我国电力现货市场的演进`（ch13 章标题）
+- ch13 引言段、`## 13.1`、`### 13.1.1`、`#### 13.1.1.1`、`#### 13.1.1.2`
+- 末行（ch12 L449）结束在 `…改为全电量竞争、两`（句子未完）
+
+ch13 文件目前以 `<PageDivider pdf-page="250" />` 开头，第二行是 `部制电价模式并进入年度…`——**承接** ch12 L449 的 `两`。这种"半句跨页"形成 A 类场景，**留给 ch13 的 within-file 清理处理**，不在 D 阶段合并。
+
+- [ ] **Step 1: 读取两文件确认剪切线** —
+  - 读 `site/ch12/index.md`，确认 L420 是 `## 12.10 本章小结` 段落的最后一行（结尾 `…等特点。`），L421 为空行，L422 开始为 `<PageDivider pdf-page="247" />`。
+  - 读 `site/ch13/index.md`，确认 L1-3 是 frontmatter，L4 为空行，L5 为 `<PageDivider pdf-page="250" />`。
+  - 若实际行号与上述不符（例如 ch12 末尾还有意外内容），**停下来报告 NEEDS_CONTEXT**。
+
+- [ ] **Step 2: 在 ch12 删除 L422 到 EOF** —
+  - 用 `Edit` 工具：`old_string` 为 ch12 L420-449 的完整内容（从 `…等特点。` 到 `…改为全电量竞争、两`，含中间所有空行、PageDivider、标题、段落），`new_string` 为只保留 `…等特点。` + 一个换行。
+  - 改完后 ch12 应结束于本章小结段落，总行数从 449 降到约 421。
+
+- [ ] **Step 3: 在 ch13 frontmatter 后插入被剪切的块** —
+  - 用 `Edit` 工具：`old_string` 为 ch13 当前 L1-5（frontmatter + 空行 + `<PageDivider pdf-page="250" />`），`new_string` 为 frontmatter + 空行 + 被剪切的 28 行 + 空行 + `<PageDivider pdf-page="250" />`。
+  - 改完后 ch13 应在 frontmatter 后立即出现 `# 第三篇 国内实践篇`、ch13 章标题、引言、各小节，最后接到原本的 pdf-page 250 内容。
+
+- [ ] **Step 4: 自检** —
+  - 读 ch12 全文，确认：
+    - 末尾是 `…等特点。`（本章小结段落）
+    - 不再含任何 `13.`、`第三篇`、`我国电力现货市场的演进` 等 ch13 内容
+    - frontmatter 完好
+  - 读 ch13 全文，确认：
+    - frontmatter 后第一个 H1 是 `# 第三篇 国内实践篇`
+    - 紧跟着是 `## 我国电力现货市场的演进`、引言、`## 13.1` 等
+    - 原 ch13 内容（pdf-page 250 起）完整保留
+    - 所有 PageDivider 的 pdf-page 数值未变（247/248/249/250/...）
+    - 所有图片路径未变
+
+- [ ] **Step 5: 本地预览** —
+  ```bash
+  cd site && npm run docs:dev
+  ```
+  - 打开 ch12 页面：末尾应是 "本章小结" 内容，不再出现 ch13 的开头
+  - 打开 ch13 页面：开头应是 "第三篇 国内实践篇" + ch13 章标题 + 引言 + 13.1...
+  - ScanViewer 滚动同步在两章都正常
+
+- [ ] **Step 6: 提交** —
+  ```bash
+  git add site/ch12/index.md site/ch13/index.md
+  git commit -m "fix: move ch13 opening content from ch12 tail (D-class boundary fix)"
+  ```
+  一个 commit 同时改两个文件。
+
+- [ ] **Step 7: 用户验收** — 把 ch12 和 ch13 的 diff 摘要交给用户。这是 D 类流程的试点验收点。
+
+---
+
+## Task 4.6: D 类边界修复 — 其余 4 处（ch14/15、ch15/16、ch19/20、ch20/21）
+
+**Files:**
+- Modify: 8 个文件（4 对边界）
+
+**说明**：D 类流程在 Task 4.5 验收通过后，对剩余 4 处错位边界批量执行。每对边界一个 commit。**先做 D 类再做 within-file 清理**（避免内容搬移破坏已有的 PageDivider 内联）。
+
+- [ ] **Step 1: ch14 → ch15** — 按 Task 4.5 的流程执行。ch14 末尾的 ch15 内容：ch15 章标题、15.1、15.1.1、15.1.1.1。剪切后插入 ch13 文件 frontmatter 之后。
+  - 自检 + 提交：`fix: move ch15 opening content from ch14 tail (D-class)`
+
+- [ ] **Step 2: ch15 → ch16** — ch15 末尾的 ch16 内容：16.1.1.2/16.1.1.3/16.1.2/16.1.3。剪切后插入 ch16 文件 frontmatter 之后。
+  - 提交：`fix: move ch16 opening content from ch15 tail (D-class)`
+
+- [ ] **Step 3: ch19 → ch20** — ch19 末尾的 ch20 内容：ch20 章标题、20.1、20.1.1、20.1.1.1、20.1.1.2。剪切后插入 ch20 文件 frontmatter 之后。
+  - 提交：`fix: move ch20 opening content from ch19 tail (D-class)`
+
+- [ ] **Step 4: ch20 → ch21** — ch20 末尾的 ch21 内容：`# 第四篇 技术支持系统篇`、ch21 章标题、21.1、21.1.1。剪切后插入 ch21 文件 frontmatter 之后。
+  - 提交：`fix: move ch21 opening content from ch20 tail (D-class)`
+
+- [ ] **Step 5: 整体验收** — 用户抽检 2 个边界的渲染效果。
+
+---
+
 ## Task 5: 规则备忘录写入 spec
 
 **Files:**
