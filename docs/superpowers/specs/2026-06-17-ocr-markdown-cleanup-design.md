@@ -71,15 +71,15 @@ CSS 仅有 `position: relative`，**视觉上完全不可见**（无边框、无
 
 #### 2.3.1 内联放法（A 类场景，处于同一段落的两片段之间）
 
-去掉 `<PageDivider />` 周围的空行，使其在 markdown 中成为段落的内联 HTML：
+**实测结论（2026-06-17）**：必须把 PageDivider 和前后文本放在**同一行**，否则 markdown-it 会把它当块级元素切断段落：
 
 ```md
-...不涉及电力
-<PageDivider pdf-page="21" />
-实物商品的交割...
+...不涉及电力 <PageDivider pdf-page="21" /> 实物商品的交割...
 ```
 
-连续三行无空行 → markdown 渲染为**一个 `<p>`**，文本视觉连续，divider div 仍在 DOM 中供 ScanViewer 使用。
+（一整行，不要换行）→ 渲染为一个 `<p>`，`<span class="page-divider">` 嵌在中间，ScanViewer 仍能用 data-page 同步。
+
+注意：此放法会让源文件出现超长行（合并段落全部内容 + 中间的 PageDivider 在一行）。这是实现真内联渲染的必要代价。
 
 #### 2.3.2 块级放法（天然块边界）
 
@@ -87,9 +87,13 @@ PageDivider 处于标题之间、图与文之间、本就是两个不同段落�
 
 ### 2.4 组件层面的可能调整
 
-`<div>` 嵌在 `<p>` 里是非法 HTML，浏览器会提前闭合 `<p>`。若试点发现内联放法渲染异常，把 `PageDivider.vue` 的 `<div>` 改为 `<span>`（保留 `position: relative`，IntersectionObserver 对 span 同样有效）。
+**已实施（2026-06-17）**：`<div>` 嵌在 `<p>` 里是非法 HTML。实测发现 markdown-it 把任何**行首**的 `<Tag` 都当块级处理，无论周围有没有空行、前导空格、还是把 `<div>` 改成 `<span>`。**唯一能实现真内联的放法是把 PageDivider 和前后文本放在同一行**：
 
-是否需要此调整**等试点验证后定**。
+```md
+text-before <PageDivider pdf-page="N" /> text-after
+```
+
+为此 `PageDivider.vue` 已改为渲染 `<span>`（保持 `position: relative`，IntersectionObserver 对 span 同样有效）。**A 类内联放法相应改为单行放法**：把跨页段落的两个片段和中间的 PageDivider 合并到同一行。代价是源文件中合并段落变成超长单行（部分段落 1000+ 字符），但这是实现"PageDivider 不影响排版"目标的唯一途径。
 
 ---
 
@@ -101,7 +105,7 @@ PageDivider 处于标题之间、图与文之间、本就是两个不同段落�
 
 **判定**：读完 PageDivider 前后的两个文本块，若语义上是同一自然段（前段结尾非句号/问号/叹号且话题紧密延续，或即便有标点但话题延续），则合并。
 
-**改法**：采用 §2.3.1 的内联放法。
+**改法**：采用 §2.3.1 的内联放法（**单行**：text-before + PageDivider + text-after 全在一行）。
 
 ```md
 前段（结尾通常是逗号、或句子未完）
@@ -112,9 +116,7 @@ PageDivider 处于标题之间、图与文之间、本就是两个不同段落�
 ```
 →
 ```md
-前段（结尾通常是逗号、或句子未完）
-<PageDivider pdf-page="N+1" />
-后段（承接前段）
+前段（结尾通常是逗号、或句子未完） <PageDivider pdf-page="N+1" /> 后段（承接前段）
 ```
 
 **不合并的反例**：前段以完整句号结尾、且后段是新话题起头（即便跨页）→ 保留两段，PageDivider 维持块级（§2.3.2）。
