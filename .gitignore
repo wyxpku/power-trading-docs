@@ -1,3 +1,4 @@
 .venv/
 scripts/paddleocr_output/
 *paddleocr*.log
+.DS_Store
