@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>浙江电力现货市场 — 互动学习</title>
+<!-- interactive.css:start -->
+<style>
+:root {
+  --accent: #2563eb;
+  --green: #16a34a;
+  --red: #dc2626;
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --text: #1e293b;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; font-size: 14px; }
+.layout { display: flex; gap: 16px; padding: 16px; max-width: 1400px; margin: 0 auto; }
+.layout > .sidebar { width: 340px; flex-shrink: 0; }
+.layout > .main { flex: 1; min-width: 0; }
+.panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-bottom: 12px; }
+.slider-row { margin-bottom: 14px; }
+.slider-label { display: block; font-weight: 600; margin-bottom: 4px; font-size: 13px; }
+.slider-val { display: inline-block; font-weight: 700; color: var(--accent); margin-left: 6px; min-width: 70px; }
+input[type="range"] { width: 100%; height: 6px; -webkit-appearance: none; background: var(--border); border-radius: 3px; outline: none; }
+input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; background: var(--accent); border-radius: 50%; cursor: pointer; }
+input[type="range"]::-moz-range-thumb { width: 16px; height: 16px; background: var(--accent); border-radius: 50%; cursor: pointer; border: none; }
+.metric-row { display: flex; gap: 12px; flex-wrap: wrap; }
+.metric { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; text-align: center; flex: 1; min-width: 90px; }
+.metric .label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.metric .value { font-size: 22px; font-weight: 700; margin-top: 2px; }
+.preset-btn { padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); font-size: 12px; cursor: pointer; transition: all 0.15s; font-family: inherit; }
+.preset-btn:hover { border-color: var(--accent); color: var(--accent); }
+.preset-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.btn { padding: 8px 16px; border: 1px solid var(--accent); border-radius: 6px; background: var(--accent); color: #fff; font-size: 13px; cursor: pointer; font-family: inherit; }
+.formula { background: #f1f5f9; border-left: 3px solid var(--accent); padding: 10px 14px; border-radius: 4px; font-family: "SF Mono", "Fira Code", monospace; font-size: 13px; margin: 8px 0; }
+.explain { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px 16px; font-size: 13px; margin-bottom: 12px; }
+.notice { background: #f0fdf4; border: 1px solid #bbf7d0; border-left: 4px solid var(--green); border-radius: 6px; padding: 10px 14px; font-size: 13px; margin-bottom: 10px; }
+.prompt-box { background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; padding: 10px 14px; font-size: 12px; color: #92400e; margin-bottom: 8px; }
+h1 { font-size: 20px; margin-bottom: 8px; }
+h2 { font-size: 16px; margin-bottom: 8px; }
+h3 { font-size: 14px; margin-bottom: 8px; }
+.section-title { font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; margin-top: 4px; }
+svg { display: block; margin: 0 auto; }
+</style>
+<!-- interactive.css:end -->
+<style>
+.tab-nav { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+.tab-btn { padding: 7px 16px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface); cursor: pointer; font-size: 13px; color: var(--text-muted); }
+.tab-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* Timeline */
+.timeline { position: relative; padding-left: 28px; }
+.timeline::before { content:''; position:absolute; left:10px; top:0; bottom:0; width:2px; background:var(--border); }
+.tl-item { position:relative; margin-bottom:20px; }
+.tl-dot { position:absolute; left:-23px; top:4px; width:12px; height:12px; border-radius:50%; background:var(--accent); border:2px solid var(--surface); box-shadow:0 0 0 2px var(--accent); }
+.tl-item.dim .tl-dot { background:var(--border); box-shadow:0 0 0 2px var(--border); }
+.tl-title { font-weight:600; font-size:13px; }
+.tl-desc { font-size:12px; color:var(--text-muted); margin-top:2px; }
+.tl-badge { display:inline-block; font-size:11px; padding:1px 7px; border-radius:10px; background:#eff6ff; color:var(--accent); margin-left:6px; }
+
+/* Grid map */
+.grid-map { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.grid-node { background:var(--bg); border:1px solid var(--border); border-radius:6px; padding:10px; text-align:center; }
+.grid-node .node-label { font-size:11px; color:var(--text-muted); }
+.grid-node .node-val { font-size:20px; font-weight:700; color:var(--accent); }
+
+/* Settlement flow */
+.settle-flow { display:flex; align-items:stretch; gap:0; }
+.settle-box { flex:1; border:1px solid var(--border); border-radius:6px; padding:12px; background:var(--bg); }
+.settle-box .s-label { font-size:11px; color:var(--text-muted); margin-bottom:4px; }
+.settle-box .s-val { font-size:16px; font-weight:700; }
+.settle-arrow { display:flex; align-items:center; color:var(--text-muted); font-size:18px; padding:0 6px; }
+.settle-total { background:#eff6ff; border:1.5px solid var(--accent); border-radius:6px; padding:12px; margin-top:12px; text-align:center; }
+.settle-total .s-label { font-size:12px; color:var(--accent); }
+.settle-total .s-val { font-size:20px; font-weight:700; color:var(--accent); }
+
+/* Contract coverage */
+.coverage-bar-wrap { height:20px; background:var(--border); border-radius:10px; overflow:hidden; margin:10px 0; }
+.coverage-bar { height:100%; background:var(--accent); border-radius:10px; transition:width 0.3s; }
+.coverage-bar.danger { background:#dc2626; }
+.coverage-bar.warn { background:#d97706; }
+
+.notice-box { background:#fefce8; border:1px solid #fde68a; border-radius:6px; padding:10px 12px; margin-top:12px; font-size:12px; }
+.notice-box strong { color:#92400e; }
+
+/* Two col */
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+@media(max-width:600px){ .two-col,.grid-map,.settle-flow{ display:block; } .settle-arrow{ display:none; } }
+</style>
+</head>
+<body>
+<div style="padding:16px; max-width:900px; margin:0 auto;">
+
+  <div class="panel">
+    <div style="font-size:18px; font-weight:700; margin-bottom:4px;">第15章 浙江电力现货市场</div>
+    <div style="font-size:13px; color:var(--text-muted);">Pass 1 · Cluster 3：中国电力现货市场实践</div>
+  </div>
+
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('t1')">① 浙江电网特点</button>
+    <button class="tab-btn" onclick="switchTab('t2')">② 结算原则</button>
+    <button class="tab-btn" onclick="switchTab('t3')">③ 政府授权合约</button>
+    <button class="tab-btn" onclick="switchTab('t4')">④ 试运行历程</button>
+    <button class="tab-btn" onclick="switchTab('t5')">⑤ 核心矛盾</button>
+  </div>
+
+  <!-- TAB 1: 电网特点 -->
+  <div id="t1" class="tab-content active">
+    <div class="panel">
+      <div style="font-weight:600; margin-bottom:10px;">浙江电网：为什么特殊？</div>
+
+      <div class="grid-map">
+        <div class="grid-node">
+          <div class="node-val">35.7%</div>
+          <div class="node-label">外来电占最高负荷比例</div>
+        </div>
+        <div class="grid-node">
+          <div class="node-val">2835</div>
+          <div class="node-label">HHI 市场集中度指数（寡占型）</div>
+        </div>
+        <div class="grid-node">
+          <div class="node-val">107.7 GW</div>
+          <div class="node-label">2021年总装机容量</div>
+        </div>
+        <div class="grid-node">
+          <div class="node-val">177 TWh</div>
+          <div class="node-label">年受电量（占总用电量32%）</div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px; font-weight:600; font-size:13px; margin-bottom:8px;">三个特点 → 三个核心设计选择</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
+        <div class="card" style="padding:10px;">
+          <div style="font-size:11px; color:var(--text-muted); margin-bottom:4px;">特点 1</div>
+          <div style="font-weight:600; font-size:12px; color:#dc2626;">网架密集、阻塞频繁</div>
+          <div style="font-size:11px; margin-top:4px; color:var(--text-muted);">→ 选择<strong>节点电价（LMP）</strong>而非统一价</div>
+        </div>
+        <div class="card" style="padding:10px;">
+          <div style="font-size:11px; color:var(--text-muted); margin-bottom:4px;">特点 2</div>
+          <div style="font-weight:600; font-size:12px; color:#d97706;">外来电占比高、不可控</div>
+          <div style="font-size:11px; margin-top:4px; color:var(--text-muted);">→ 外来电作<strong>边界条件</strong>，不参与省内现货</div>
+        </div>
+        <div class="card" style="padding:10px;">
+          <div style="font-size:11px; color:var(--text-muted); margin-bottom:4px;">特点 3</div>
+          <div style="font-weight:600; font-size:12px; color:var(--accent);">浙能集团占比约48%</div>
+          <div style="font-size:11px; margin-top:4px; color:var(--text-muted);">→ <strong>全电量参与</strong>集中出清，抑制市场力</div>
+        </div>
+      </div>
+
+      <div class="notice-box">
+        <strong>📌 注意：</strong>节点电价的选择首先是因为<em>阻塞频繁</em>，需要通过价格信号反映各节点资源稀缺程度。市场集中度高是另一个独立的问题（需要用全电量出清应对）——这两者的解法不同，不能混淆。
+      </div>
+    </div>
+
+    <div class="panel">
+      <div style="font-weight:600; margin-bottom:8px;">外来电为何只能做边界条件？</div>
+      <div style="font-size:13px; color:var(--text-muted); line-height:1.8;">
+        浙江地处华东枢纽，同时接收福建来电<em>并转送</em>相邻省份。外来电的通道能力受上级调度和多省运行方式影响，省内市场无法掌握——必须先由国调/华东网调确定跨省计划，省内才能安全校核。因此"外来电 = 边界条件"是当前阶段最务实的选择。
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 2: 结算原则 -->
+  <div id="t2" class="tab-content">
+    <div class="panel">
+      <div style="font-weight:600; margin-bottom:12px;">结算核心原则：日前基准 · 实时差量 · 合约差价</div>
+
+      <div class="notice-box" style="margin-bottom:14px;">
+        <strong>💡 一句话理解：</strong>日前结算打底，实时偏差找补，中长期合约锁定最终收益。
+      </div>
+
+      <div style="margin-bottom:12px; font-size:13px; color:var(--text-muted);">以一台燃煤机组某天为例：</div>
+
+      <!-- 互动参数 -->
+      <div class="panel" style="background:var(--bg);">
+        <div class="slider-row">
+          <span class="slider-label">日前中标电量 (MWh)</span>
+          <input type="range" id="daAheadMWh" min="100" max="1000" value="500" oninput="updateSettle()">
+          <span class="slider-val" id="daAheadMWhVal">500</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">日前出清价 (元/MWh)</span>
+          <input type="range" id="daPrice" min="100" max="700" value="380" oninput="updateSettle()">
+          <span class="slider-val" id="daPriceVal">380</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">实际发电量 (MWh)</span>
+          <input type="range" id="actualMWh" min="100" max="1100" value="550" oninput="updateSettle()">
+          <span class="slider-val" id="actualMWhVal">550</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">实时出清价 (元/MWh)</span>
+          <input type="range" id="rtPrice" min="0" max="1000" value="420" oninput="updateSettle()">
+          <span class="slider-val" id="rtPriceVal">420</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">中长期合约价 (元/MWh)</span>
+          <input type="range" id="contractPrice" min="200" max="600" value="450" oninput="updateSettle()">
+          <span class="slider-val" id="contractPriceVal">450</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">合约覆盖电量 (MWh)</span>
+          <input type="range" id="contractMWh" min="0" max="1000" value="450" oninput="updateSettle()">
+          <span class="slider-val" id="contractMWhVal">450</span>
+        </div>
+      </div>
+
+      <div class="settle-flow" style="margin-top:12px;">
+        <div class="settle-box">
+          <div class="s-label">① 日前基准结算</div>
+          <div class="s-val" id="daSettle" style="color:var(--accent);">¥190,000</div>
+          <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">日前量 × 日前价</div>
+        </div>
+        <div class="settle-arrow">+</div>
+        <div class="settle-box">
+          <div class="s-label">② 实时差量结算</div>
+          <div class="s-val" id="rtSettle" style="color:var(--green);">¥21,000</div>
+          <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">偏差量 × 实时价</div>
+        </div>
+        <div class="settle-arrow">+</div>
+        <div class="settle-box">
+          <div class="s-label">③ 合约差价结算</div>
+          <div class="s-val" id="cfdSettle" style="color:#7c3aed;">¥30,000</div>
+          <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">合约量 × (合约价 - 结算参考价)</div>
+        </div>
+      </div>
+
+      <div class="settle-total" style="margin-top:12px;">
+        <div class="s-label">机组总收益（三项合计）</div>
+        <div class="s-val" id="totalSettle">¥241,000</div>
+      </div>
+
+      <div class="notice-box">
+        <strong>📌 注意：</strong>调整"合约价"远高于或低于"实时价"时，看合约差价如何对冲现货波动。这就是差价合约的风险隔离作用。当合约覆盖量接近实际发电量时，机组收益几乎锁定在合约价水平。
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 3: 政府授权合约 -->
+  <div id="t3" class="tab-content">
+    <div class="panel">
+      <div style="font-weight:600; margin-bottom:10px;">政府授权合约：计划 → 市场的缓冲器</div>
+
+      <div style="font-size:13px; margin-bottom:12px; color:var(--text-muted);">
+        政府授权合约是一种<strong>差价合约（CFD）</strong>，发电企业与电网公司（代理未市场化用户）在政府主导下签订。合约价格由政府核定，不随现货波动。
+      </div>
+
+      <div class="panel" style="background:var(--bg); margin-bottom:0;">
+        <div class="slider-row">
+          <span class="slider-label">合约覆盖比例 (%)</span>
+          <input type="range" id="coverageSlider" min="0" max="110" value="90" oninput="updateCoverage()">
+          <span class="slider-val" id="coverageVal">90%</span>
+        </div>
+      </div>
+
+      <div style="margin-top:12px;">
+        <div style="font-size:12px; color:var(--text-muted); margin-bottom:4px;">合约覆盖量 vs 实际发电量</div>
+        <div class="coverage-bar-wrap">
+          <div class="coverage-bar" id="coverageBar" style="width:90%"></div>
+        </div>
+        <div id="coverageStatus" style="font-size:13px; font-weight:600; color:var(--green); margin-top:6px;">✅ 合理区间（90%）：发电侧基础收益有保障，少量电量参与现货竞争</div>
+      </div>
+
+      <div id="coverageDetail" style="margin-top:12px; font-size:12px; color:var(--text-muted); background:var(--bg); padding:10px; border-radius:6px; border:1px solid var(--border);">
+        发电企业约90%的电量收益已通过合约锁定，只有约10%暴露在现货价格波动中。这既保护了发电企业基础利益，又在边际上保留了竞争压力。
+      </div>
+
+      <div class="notice-box" style="margin-top:12px;">
+        <strong>📌 第一次试运行的教训：</strong>由于实际负荷偏低，合约覆盖率一度高达 <strong>106.49%</strong>——合约量超过了实际发电量！结果出现"少发不发反而收益更高"的扭曲。这正是为什么要把覆盖率控制在合理区间内。
+      </div>
+    </div>
+
+    <div class="panel">
+      <div style="font-weight:600; margin-bottom:10px;">合约比例设计的演进（各电源类型）</div>
+      <div style="font-size:12px;">
+        <table style="width:100%; border-collapse:collapse; font-size:12px;">
+          <tr style="background:var(--bg);">
+            <th style="padding:7px 10px; text-align:left; border-bottom:1px solid var(--border);">电源类型</th>
+            <th style="padding:7px 10px; text-align:center; border-bottom:1px solid var(--border);">第4次试运行</th>
+            <th style="padding:7px 10px; text-align:center; border-bottom:1px solid var(--border);">第5次试运行</th>
+            <th style="padding:7px 10px; text-align:left; border-bottom:1px solid var(--border);">设计逻辑</th>
+          </tr>
+          <tr>
+            <td style="padding:7px 10px;">煤电</td>
+            <td style="padding:7px 10px; text-align:center;">~90%</td>
+            <td style="padding:7px 10px; text-align:center;">集中竞价确定</td>
+            <td style="padding:7px 10px; color:var(--text-muted);">大头，稳定兜底</td>
+          </tr>
+          <tr style="background:var(--bg);">
+            <td style="padding:7px 10px;">燃气</td>
+            <td style="padding:7px 10px; text-align:center;">事前3%+事后67%</td>
+            <td style="padding:7px 10px; text-align:center;">事前3%+事后67%</td>
+            <td style="padding:7px 10px; color:var(--text-muted);">气电有容量电费，事后分配防套利</td>
+          </tr>
+          <tr>
+            <td style="padding:7px 10px;">核电</td>
+            <td style="padding:7px 10px; text-align:center;">事后99%</td>
+            <td style="padding:7px 10px; text-align:center;">事后99%</td>
+            <td style="padding:7px 10px; color:var(--text-muted);">优先消纳，以实发确定合约</td>
+          </tr>
+          <tr style="background:var(--bg);">
+            <td style="padding:7px 10px;">水电</td>
+            <td style="padding:7px 10px; text-align:center;">事后90%</td>
+            <td style="padding:7px 10px; text-align:center;">事后90%</td>
+            <td style="padding:7px 10px; color:var(--text-muted);">来水不受控，事后分配合理</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 4: 试运行历程 -->
+  <div id="t4" class="tab-content">
+    <div class="panel">
+      <div style="font-weight:600; margin-bottom:14px;">五次结算试运行：从1周到季度</div>
+
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-title">第1次结算试运行 <span class="tl-badge">2019.9 · 1周</span></div>
+          <div class="tl-desc">首次；仅220kV+统调机组；5段报价；发现合约覆盖率106%的问题</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-title">第2次结算试运行 <span class="tl-badge">2020.5 · 1周</span></div>
+          <div class="tl-desc">扩至110kV机组；改10段报价；完善成本补偿参数；检修高峰期运行</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-title">第3次结算试运行 <span class="tl-badge">2020.7 · 整月</span></div>
+          <div class="tl-desc">首次整月；迎峰度夏；价格下限调至 -200元/MWh（拉大峰谷差）；台风应急预案</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-title">第4次结算试运行 <span class="tl-badge">2021.3-5 · 季度</span></div>
+          <div class="tl-desc">首次季度连续运行；大检修+汛期双重压力；优化燃气合约分配（激励多发）</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-title">第5次结算试运行 <span class="tl-badge">2021.12 · 整月</span></div>
+          <div class="tl-desc">首次引入用户侧 → <strong>进入双边市场新阶段</strong>；迎峰度冬；均价531元/MWh（比基准价+28%）</div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px; background:var(--bg); border-radius:6px; padding:12px; border:1px solid var(--border);">
+        <div style="font-size:12px; font-weight:600; margin-bottom:8px; color:var(--accent);">关键价格数据对比</div>
+        <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:8px; font-size:11px; text-align:center;">
+          <div>
+            <div style="color:var(--text-muted);">第1次 日前均价</div>
+            <div style="font-weight:700; font-size:14px;">267.5 元</div>
+          </div>
+          <div>
+            <div style="color:var(--text-muted);">第2次 日前均价</div>
+            <div style="font-weight:700; font-size:14px;">353.5 元</div>
+          </div>
+          <div>
+            <div style="color:var(--text-muted);">第4次 日前均价</div>
+            <div style="font-weight:700; font-size:14px;">379.4 元</div>
+          </div>
+          <div>
+            <div style="color:var(--text-muted);">第5次 日前均价</div>
+            <div style="font-weight:700; font-size:14px; color:#dc2626;">531.6 元</div>
+          </div>
+        </div>
+        <div style="font-size:11px; color:var(--text-muted); margin-top:8px;">第3次均价偏低（201.7元）因为是夏季+供需相对宽松的7月。第5次大幅上涨反映煤价高企+冬季供需偏紧。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 5: 核心矛盾 -->
+  <div id="t5" class="tab-content">
+    <div class="panel">
+      <div style="font-weight:600; margin-bottom:12px;">浙江市场建设的三大核心矛盾</div>
+
+      <div style="display:grid; grid-template-columns:1fr; gap:12px;">
+        <div class="card" style="padding:12px; border-left:3px solid #dc2626;">
+          <div style="font-weight:600; margin-bottom:6px;">矛盾1：合约覆盖过高 vs 价格信号失真</div>
+          <div style="font-size:12px; color:var(--text-muted);">
+            第5次试运行中长期合约覆盖率高达<strong>99%</strong>，导致发电侧报价策略变成"保量优先"而非"逐利出清"。高峰时段合约覆盖86%+，低谷覆盖56%+，电力现货市场峰谷价差仅64.5元（价比1.16:1），无法发挥价格信号引导新能源消纳的作用。
+            <br><br><em>破解之道：逐步降低合约覆盖比例，同时拉大现货峰谷价差范围（已引入-200元下限）。</em>
+          </div>
+        </div>
+
+        <div class="card" style="padding:12px; border-left:3px solid #d97706;">
+          <div style="font-weight:600; margin-bottom:6px;">矛盾2：中长期电量合同 vs 带曲线现货结算</div>
+          <div style="font-size:12px; color:var(--text-muted);">
+            现货市场以30min为结算时段，而中长期合同历史上都是年/月度电量合同（无时标）。两者衔接需要把电量合同"拆解"成按时段的功率曲线——涉及峰谷价差设计、曲线分解方法、合同重新约定等复杂工作。
+            <br><br><em>破解之道：政府出典型曲线；引导中长期交易直接以带曲线形式申报。</em>
+          </div>
+        </div>
+
+        <div class="card" style="padding:12px; border-left:3px solid var(--accent);">
+          <div style="font-weight:600; margin-bottom:6px;">矛盾3：省间-省内市场衔接的时序问题</div>
+          <div style="font-size:12px; color:var(--text-muted);">
+            省间日前市场先于省内，省内需要先完成预出清才能参与省间——这要求省内在竞价日11:00前完成预出清，再参与省间出清，然后再以省间结果为边界条件做正式出清（17:00前完成）。时序紧凑，且省间实际交割与省内出力偏差采用金融结算处理，增加了结算复杂度。
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" style="background:#eff6ff; border-color:var(--accent);">
+      <div style="font-weight:600; color:var(--accent); margin-bottom:8px;">浙江模式的核心总结</div>
+      <div style="font-size:13px; line-height:1.8;">
+        <strong>"中长期差价合约 + 现货全电量集中出清"</strong><br>
+        · 政府授权合约 → 保平稳过渡，避免价格剧烈波动<br>
+        · 全电量集中出清 → 抑制市场力，充分发现价格<br>
+        · 节点电价（LMP） → 真实反映阻塞，优化资源配置<br>
+        · 调频与电能量联合出清 → 降低报价难度，实现成本最优
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function switchTab(id) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+function fmt(n) {
+  return '¥' + Math.round(n).toLocaleString('zh-CN');
+}
+
+function updateSettle() {
+  const da = +document.getElementById('daAheadMWh').value;
+  const daP = +document.getElementById('daPrice').value;
+  const actual = +document.getElementById('actualMWh').value;
+  const rtP = +document.getElementById('rtPrice').value;
+  const cP = +document.getElementById('contractPrice').value;
+  const cMWh = +document.getElementById('contractMWh').value;
+
+  document.getElementById('daAheadMWhVal').textContent = da;
+  document.getElementById('daPriceVal').textContent = daP;
+  document.getElementById('actualMWhVal').textContent = actual;
+  document.getElementById('rtPriceVal').textContent = rtP;
+  document.getElementById('contractPriceVal').textContent = cP;
+  document.getElementById('contractMWhVal').textContent = cMWh;
+
+  const daSettle = da * daP;
+  const rtSettle = (actual - da) * rtP;  // deviation settled at RT price
+  const refPrice = (da * daP + (actual - da) * rtP) / actual || daP;  // weighted avg
+  const cfdSettle = cMWh * (cP - refPrice);
+  const total = daSettle + rtSettle + cfdSettle;
+
+  document.getElementById('daSettle').textContent = fmt(daSettle);
+  document.getElementById('rtSettle').textContent = fmt(rtSettle);
+  document.getElementById('rtSettle').style.color = rtSettle >= 0 ? 'var(--green)' : '#dc2626';
+  document.getElementById('cfdSettle').textContent = fmt(cfdSettle);
+  document.getElementById('cfdSettle').style.color = cfdSettle >= 0 ? '#7c3aed' : '#dc2626';
+  document.getElementById('totalSettle').textContent = fmt(total);
+}
+
+function updateCoverage() {
+  const v = +document.getElementById('coverageSlider').value;
+  document.getElementById('coverageVal').textContent = v + '%';
+  const bar = document.getElementById('coverageBar');
+  const status = document.getElementById('coverageStatus');
+  const detail = document.getElementById('coverageDetail');
+
+  bar.style.width = Math.min(v, 100) + '%';
+
+  if (v > 100) {
+    bar.className = 'coverage-bar danger';
+    status.style.color = '#dc2626';
+    status.textContent = '⚠️ 危险区间（>' + v + '%）：合约量超过实发量！"少发不发反而多收益"扭曲出现（浙江第1次试运行的教训）';
+    detail.textContent = '合约电量超过实际发电量时，发电企业可以通过"不发电、收合约差价"来获益。这完全破坏了市场激励机制，是政府授权合约机制设计中最需要防范的陷阱。';
+  } else if (v > 95) {
+    bar.className = 'coverage-bar warn';
+    status.style.color = '#d97706';
+    status.textContent = '⚡ 偏高区间（' + v + '%）：现货价格信号微弱，发电侧缺乏竞争激励（浙江第5次试运行情况）';
+    detail.textContent = '合约覆盖率接近100%时，发电侧最优策略变为"保量优先"而非"逐利出清"。高峰时段提价动机消失，峰谷价差收窄，现货市场引导新能源消纳和调峰的功能大打折扣。';
+  } else if (v >= 80) {
+    bar.className = 'coverage-bar';
+    status.style.color = 'var(--green)';
+    status.textContent = '✅ 合理区间（' + v + '%）：发电侧基础收益有保障，边际电量参与现货竞争';
+    detail.textContent = '约' + v + '%的电量通过合约锁定收益，约' + (100-v) + '%的电量暴露在现货价格信号中。这个比例下，发电企业有动机优化报价策略，现货市场能够形成有意义的价格信号，同时发电企业整体财务风险可控。';
+  } else {
+    bar.className = 'coverage-bar';
+    status.style.color = '#d97706';
+    status.textContent = '📉 覆盖率偏低（' + v + '%）：价格信号充分，但发电企业财务风险较高';
+    detail.textContent = '合约覆盖率较低时，发电企业需要承受更多现货价格波动风险。在市场建设初期、规则尚不完善时，这会增加市场主体的参与顾虑。一般需要等市场主体成熟后再逐步降低覆盖比例。';
+  }
+}
+
+// Init
+updateSettle();
+updateCoverage();
+</script>
+</body>
+</html>

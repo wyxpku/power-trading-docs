@@ -28,14 +28,17 @@
 - **FTR** (Financial Transmission Right): 金融输电权，在LMP出清中抵消阻塞成本的金融工具
 
 ## G
+- **政府授权合约** (Government Authorized Contract): 浙江市场过渡期机制，将未放开的发电计划转化为带曲线的差价合约（CFD），由政府核定价格，电网公司与发电企业签订，初期覆盖约90%电量，逐步退出
 
 ## H
+- **HHI** (Herfindahl-Hirschman Index): 市场集中度指数，衡量市场竞争程度。浙江省内统调市场HHI约2835，属寡占型市场（>2500）
 
 ## I
 - **ISO** (Independent System Operator): 独立系统运营商
 - **ISO-NE**: 新英格兰独立系统运营商
 
 ## J
+- **结算试运行** (Settlement Trial Run): 中国电力现货市场建设中，在正式运行前进行的带真实结算数据的试运行。浙江共开展5次（2019-2021），从1周逐步扩展到季度，用于验证规则和系统
 
 ## K
 
