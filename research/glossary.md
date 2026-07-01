@@ -2,6 +2,7 @@
 
 ## A
 - **AGC** (Automatic Generation Control): 自动发电控制，即负荷跟踪与频率控制
+- **ATC** (Available Transfer Capability): 可用输电能力，省间出清中动态计算各级联通道的剩余输电容量
 - **AEMO**: 澳大利亚能源市场运营机构
 - **AEMC**: 澳大利亚能源市场委员会
 - **AER**: 澳大利亚能源监管机构
