@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>山西电力现货市场 - 新能源与调峰互动</title>
+<!-- interactive.css:start -->
+<style>
+:root {
+  --accent: #2563eb;
+  --green: #16a34a;
+  --red: #dc2626;
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --text: #1e293b;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+.layout {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.layout > .sidebar {
+  width: 340px;
+  flex-shrink: 0;
+}
+
+.layout > .main {
+  flex: 1;
+  min-width: 0;
+}
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.slider-row {
+  margin-bottom: 14px;
+}
+
+.slider-label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 4px;
+  font-size: 13px;
+}
+
+.slider-val {
+  display: inline-block;
+  font-weight: 700;
+  color: var(--accent);
+  margin-left: 6px;
+  min-width: 70px;
+}
+
+input[type="range"] {
+  width: 100%;
+  height: 6px;
+  -webkit-appearance: none;
+  background: var(--border);
+  border-radius: 3px;
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  background: var(--accent);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: var(--accent);
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+}
+
+.metric-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.metric {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  text-align: center;
+  flex: 1;
+  min-width: 90px;
+}
+
+.metric .label {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.metric .value {
+  font-size: 22px;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.preset-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.preset-btn {
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.preset-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.preset-btn.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.btn {
+  padding: 8px 16px;
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.formula {
+  background: #f1f5f9;
+  border-left: 3px solid var(--accent);
+  padding: 10px 14px;
+  border-radius: 4px;
+  font-family: "SF Mono", "Fira Code", monospace;
+  font-size: 13px;
+  margin: 8px 0;
+}
+
+.explain {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.explain.warning {
+  background: #fef3c7;
+  border-color: #fcd34d;
+}
+
+.explain.danger {
+  background: #fee2e2;
+  border-color: #fca5a5;
+}
+
+.notice {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-left: 4px solid var(--green);
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+
+.prompt-box {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: #92400e;
+  margin-bottom: 8px;
+}
+
+.prompt-box::before {
+  content: "💡 ";
+}
+
+h1, h2, h3 {
+  margin-bottom: 8px;
+}
+
+h1 { font-size: 20px; }
+h2 { font-size: 16px; }
+h3 { font-size: 14px; }
+
+.section-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+  margin-top: 4px;
+}
+
+svg { display: block; margin: 0 auto; }
+</style>
+<!-- interactive.css:end -->
+<style>
+h1 { font-size: 20px; margin-bottom: 4px; }
+h2 { font-size: 16px; margin-bottom: 8px; }
+.top { max-width: 1100px; margin: 0 auto; padding: 16px 16px 0; }
+.diagram { height: 280px; border: 1px solid var(--border); border-radius: 8px; background: #fff; position: relative; overflow: hidden; }
+.bar { position: absolute; bottom: 42px; width: 80px; border-radius: 6px 6px 0 0; display: flex; align-items: flex-start; justify-content: center; padding-top: 8px; font-weight: 700; font-size: 12px; color: #fff; transition: height 0.2s ease, background 0.2s ease; }
+.bar span { writing-mode: vertical-rl; text-orientation: mixed; white-space: nowrap; }
+.axis { position: absolute; left: 32px; right: 16px; bottom: 42px; height: 1px; background: var(--border); }
+.demand-line { position: absolute; left: 24px; right: 16px; border-top: 2px dashed #111827; transition: bottom 0.2s ease; }
+.demand-line label { position: absolute; right: 4px; top: -22px; background: #fff; padding-left: 6px; font-size: 12px; font-weight: 700; }
+.zero-zone { position: absolute; left: 16px; right: 16px; bottom: 42px; height: 34px; background: #ecfdf5; border-top: 1px solid #86efac; }
+.status { font-size: 14px; line-height: 1.8; }
+.price-pill { display: inline-block; padding: 4px 10px; border-radius: 999px; background: #eff6ff; color: var(--accent); font-weight: 700; }
+.price-pill.low { background: #ecfdf5; color: #15803d; }
+.price-pill.high { background: #fef2f2; color: #b91c1c; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.step { border-left: 3px solid var(--accent); padding: 8px 10px; background: #f8fafc; margin-bottom: 8px; border-radius: 4px; }
+.mini-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.mini-table td, .mini-table th { border-bottom: 1px solid var(--border); padding: 7px; text-align: left; }
+.mini-table th { color: var(--text-muted); font-weight: 600; }
+.scenario-btns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+@media (max-width: 800px) {
+  .layout, .two-col { display: block; }
+  .layout > .sidebar { width: auto; }
+  .scenario-btns { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="panel">
+    <h1>第16章 山西电力现货市场</h1>
+    <div style="color:var(--text-muted); font-size:13px;">看懂“新能源优先、全电量优化”：为什么现货价格会接近 0，火电为什么会主动让出空间</div>
+  </div>
+</div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="panel">
+      <h2>调参数</h2>
+      <div class="slider-row">
+        <label class="slider-label" for="load">省内+外送用电需求 <span class="slider-val" id="loadVal"></span></label>
+        <input id="load" type="range" min="28" max="44" value="34" step="1">
+      </div>
+      <div class="slider-row">
+        <label class="slider-label" for="renew">新能源预测出力 <span class="slider-val" id="renewVal"></span></label>
+        <input id="renew" type="range" min="4" max="22" value="16" step="1">
+      </div>
+      <div class="slider-row">
+        <label class="slider-label" for="thermalMin">火电最小运行下限 <span class="slider-val" id="thermalMinVal"></span></label>
+        <input id="thermalMin" type="range" min="8" max="24" value="18" step="1">
+      </div>
+      <div class="slider-row">
+        <label class="slider-label" for="thermalFlex">可释放下调能力 <span class="slider-val" id="thermalFlexVal"></span></label>
+        <input id="thermalFlex" type="range" min="0" max="8" value="3" step="1">
+      </div>
+      <div class="slider-row">
+        <label class="slider-label" for="contract">火电低谷中长期合约覆盖 <span class="slider-val" id="contractVal"></span></label>
+        <input id="contract" type="range" min="0" max="100" value="45" step="5">
+      </div>
+
+      <div class="scenario-btns">
+        <button class="preset-btn" data-preset="wind">风光大发</button>
+        <button class="preset-btn" data-preset="peak">晚高峰</button>
+        <button class="preset-btn" data-preset="stiff">下限僵硬</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>山西的核心设定</h2>
+      <div class="step">新能源“报量不报价”：报预测出力曲线，优先进入出清。</div>
+      <div class="step">火电“报量报价”：既承担供电，又承担向下调节。</div>
+      <div class="step">中长期是差价合约：不再锁死物理发电曲线，主要锁收益、控风险。</div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="panel">
+      <h2>出清画面</h2>
+      <div class="diagram" id="diagram">
+        <div class="zero-zone"></div>
+        <div class="axis"></div>
+        <div class="demand-line" id="demandLine"><label id="demandLabel"></label></div>
+        <div class="bar" id="renewBar" style="left:80px; background:#16a34a;"><span>新能源优先</span></div>
+        <div class="bar" id="mustBar" style="left:210px; background:#64748b;"><span>火电必须开</span></div>
+        <div class="bar" id="flexBar" style="left:340px; background:#2563eb;"><span>火电可调节</span></div>
+        <div class="bar" id="spillBar" style="left:470px; background:#dc2626;"><span>弃风弃光风险</span></div>
+      </div>
+      <div class="metric-row" style="margin-top:12px;">
+        <div class="metric"><div class="label">模拟现货价格</div><div class="value" id="price"></div></div>
+        <div class="metric"><div class="label">新能源消纳</div><div class="value" id="absorb"></div></div>
+        <div class="metric"><div class="label">火电出力</div><div class="value" id="thermal"></div></div>
+        <div class="metric"><div class="label">系统状态</div><div class="value" id="state"></div></div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <section class="panel">
+        <h2>发生了什么</h2>
+        <div class="status" id="narrative"></div>
+      </section>
+      <section class="panel">
+        <h2>火电为什么愿意降下限</h2>
+        <table class="mini-table">
+          <tr><th>情形</th><th>动机</th></tr>
+          <tr><td>中长期少</td><td>少发低价现货电，减少亏损。</td></tr>
+          <tr><td>中长期多</td><td>低价时少发，按合约卖出差价，增加收益。</td></tr>
+          <tr><td>非供热机组</td><td>降下限争取在线，避免频繁启停。</td></tr>
+        </table>
+        <div class="notice" style="margin-top:12px;">这就是山西“现货电能量市场与深度调峰辅助服务融合”的直觉：不再总靠单独补偿调峰，而是让价格本身逼近真实调节价值。</div>
+      </section>
+    </div>
+
+    <div class="panel">
+      <h2>要注意的边界</h2>
+      <div class="prompt-box">拖到“风光大发”后，再把“火电最小运行下限”调高。你会看到：即使价格已经接近 0，只要火电物理下限压不下来，新能源仍然会被挤出。</div>
+      <div class="prompt-box">再把“可释放下调能力”调高。山西规则的意义就在这里：允许火电分时段申报更低运行下限，释放新能源消纳空间。</div>
+    </div>
+  </main>
+</div>
+
+<script>
+const ids = ["load", "renew", "thermalMin", "thermalFlex", "contract"];
+const maxGw = 46;
+function gw(v) { return `${v} GW`; }
+function yuan(v) { return `${Math.round(v)} 元/MWh`; }
+function setPreset(name) {
+  const p = {
+    wind: { load: 32, renew: 21, thermalMin: 18, thermalFlex: 5, contract: 55 },
+    peak: { load: 43, renew: 7, thermalMin: 17, thermalFlex: 2, contract: 70 },
+    stiff: { load: 32, renew: 21, thermalMin: 23, thermalFlex: 0, contract: 35 }
+  }[name];
+  Object.entries(p).forEach(([k, v]) => document.getElementById(k).value = v);
+  update();
+}
+function update() {
+  const load = +document.getElementById("load").value;
+  const renew = +document.getElementById("renew").value;
+  const min0 = +document.getElementById("thermalMin").value;
+  const flex = +document.getElementById("thermalFlex").value;
+  const contract = +document.getElementById("contract").value;
+  const minThermal = Math.max(4, min0 - flex);
+  const residual = load - renew;
+  const thermalDispatch = Math.max(minThermal, residual);
+  const surplus = Math.max(0, renew + minThermal - load);
+  const shortage = Math.max(0, load - renew - 28);
+  const absorbedRenew = Math.max(0, renew - surplus);
+  let price = 320 + Math.max(0, residual - minThermal) * 38 - surplus * 75 + shortage * 120;
+  price += (contract - 50) * 1.4;
+  price = Math.max(0, Math.min(1500, price));
+  if (surplus > 0) price = Math.max(0, price * 0.18);
+  const state = shortage > 0 ? "紧张" : surplus > 0 ? "低价" : "平衡";
+  document.getElementById("loadVal").textContent = gw(load);
+  document.getElementById("renewVal").textContent = gw(renew);
+  document.getElementById("thermalMinVal").textContent = gw(min0);
+  document.getElementById("thermalFlexVal").textContent = gw(flex);
+  document.getElementById("contractVal").textContent = `${contract}%`;
+  const height = v => Math.max(6, Math.min(210, v / maxGw * 210));
+  document.getElementById("renewBar").style.height = `${height(absorbedRenew)}px`;
+  document.getElementById("mustBar").style.height = `${height(minThermal)}px`;
+  document.getElementById("flexBar").style.height = `${height(Math.max(0, thermalDispatch - minThermal))}px`;
+  document.getElementById("spillBar").style.height = `${height(surplus)}px`;
+  document.getElementById("spillBar").style.opacity = surplus > 0 ? "1" : "0.18";
+  document.getElementById("demandLine").style.bottom = `${42 + height(load)}px`;
+  document.getElementById("demandLabel").textContent = `需求 ${gw(load)}`;
+  const priceEl = document.getElementById("price");
+  priceEl.textContent = yuan(price);
+  priceEl.style.color = price < 80 ? "#15803d" : price > 800 ? "#b91c1c" : "var(--accent)";
+  document.getElementById("absorb").textContent = `${Math.round(absorbedRenew / renew * 100)}%`;
+  document.getElementById("thermal").textContent = gw(Math.round(thermalDispatch));
+  document.getElementById("state").textContent = state;
+  const narrative = document.getElementById("narrative");
+  let html = "";
+  if (surplus > 0) {
+    html = `新能源优先出清后，叠加火电必须保持的最低出力，系统供给超过需求约 <span class="price-pill low">${gw(surplus)}</span>。这时边际电能已经不稀缺，价格会被压低，甚至接近 0。山西的解法是让火电通过降低运行下限、启停调峰和分时段调频选择，把空间让给新能源。`;
+  } else if (shortage > 0) {
+    html = `新能源出力较低且需求偏高，需要更多火电顶峰发电，边际机组报价抬高，价格升至 <span class="price-pill high">${yuan(price)}</span>。这解释了山西晚高峰价格能触及较高区间：价格在提醒系统“电力现在稀缺”。`;
+  } else {
+    html = `新能源、火电下限和需求基本匹配，系统没有明显弃电或缺电压力，价格处于 <span class="price-pill">${yuan(price)}</span> 的中间状态。这个状态下，中长期合约更多是在平滑收益，而不是替代现货优化。`;
+  }
+  narrative.innerHTML = html;
+}
+ids.forEach(id => document.getElementById(id).addEventListener("input", update));
+document.querySelectorAll("[data-preset]").forEach(btn => btn.addEventListener("click", () => setPreset(btn.dataset.preset)));
+update();
+</script>
+</body>
+</html>

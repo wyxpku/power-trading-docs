@@ -2,7 +2,7 @@
 
 > **Domain mode:** professional（工作需要）
 > **Total:** 33 章节单元 | 6 个学习集群
-> **Progress:** 9 / 33（Cluster 3 国内实践进行中）
+> **Progress:** 10 / 33（Cluster 3 国内实践进行中）
 
 ---
 
@@ -52,7 +52,8 @@
     - [[learning/protocols/2026-07-01_ch14-省间电力现货市场|protocol]]（Pass 1 完成，comprehension: partial）
 - [x] [[ch15-浙江电力现货市场]]
     - [[learning/protocols/2026-07-01_ch15-浙江电力现货市场|protocol]]（Pass 1 完成，comprehension: partial）
-- [ ] [[ch16-山西电力现货市场]]
+- [x] [[ch16-山西电力现货市场]]
+    - [[learning/protocols/2026-07-02_ch16-山西电力现货市场|protocol]]（Pass 1 完成，comprehension: partial+，合约金融属性需复习）
 - [ ] [[ch17-山东电力现货市场]]
 - [ ] [[ch18-福建电力现货市场]]
 - [ ] [[ch19-四川电力现货市场]]
