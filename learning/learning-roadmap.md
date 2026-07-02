@@ -57,6 +57,7 @@
 - [x] [[ch17-山东电力现货市场]]
     - [[learning/protocols/2026-07-02_ch17-山东电力现货市场|protocol]]（Pass 1 完成，comprehension: partial+，容量补偿/热电解耦/市场力监管主干掌握）
 - [ ] [[ch18-福建电力现货市场]]
+    - [[learning/protocols/2026-07-02_ch18-福建电力现货市场-partial|protocol]]（Pass 1 进行中，partial：渐进式市场与实时平衡机制）
 - [ ] [[ch19-四川电力现货市场]]
 - [ ] [[ch20-甘肃电力现货市场]]
 
