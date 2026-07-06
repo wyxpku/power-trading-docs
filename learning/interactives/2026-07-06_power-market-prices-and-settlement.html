@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>电力市场价格与结算关系</title>
+<!-- interactive.css:start -->
+<style>
+:root {
+  --accent: #2563eb;
+  --green: #16a34a;
+  --red: #dc2626;
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --text: #1e293b;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+.layout {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.layout > .sidebar {
+  width: 340px;
+  flex-shrink: 0;
+}
+
+.layout > .main {
+  flex: 1;
+  min-width: 0;
+}
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.slider-row {
+  margin-bottom: 14px;
+}
+
+.slider-label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 4px;
+  font-size: 13px;
+}
+
+.slider-val {
+  display: inline-block;
+  font-weight: 700;
+  color: var(--accent);
+  margin-left: 6px;
+  min-width: 70px;
+}
+
+input[type="range"] {
+  width: 100%;
+  height: 6px;
+  -webkit-appearance: none;
+  background: var(--border);
+  border-radius: 3px;
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  background: var(--accent);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: var(--accent);
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+}
+
+.metric-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.metric {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  text-align: center;
+  flex: 1;
+  min-width: 90px;
+}
+
+.metric .label {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.metric .value {
+  font-size: 22px;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.preset-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.preset-btn {
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.preset-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.preset-btn.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.btn {
+  padding: 8px 16px;
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.formula {
+  background: #f1f5f9;
+  border-left: 3px solid var(--accent);
+  padding: 10px 14px;
+  border-radius: 4px;
+  font-family: "SF Mono", "Fira Code", monospace;
+  font-size: 13px;
+  margin: 8px 0;
+}
+
+.explain {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.explain.warning {
+  background: #fef3c7;
+  border-color: #fcd34d;
+}
+
+.explain.danger {
+  background: #fee2e2;
+  border-color: #fca5a5;
+}
+
+.notice {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-left: 4px solid var(--green);
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+
+.prompt-box {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: #92400e;
+  margin-bottom: 8px;
+}
+
+.prompt-box::before {
+  content: "💡 ";
+}
+
+h1, h2, h3 {
+  margin-bottom: 8px;
+}
+
+h1 { font-size: 20px; }
+h2 { font-size: 16px; }
+h3 { font-size: 14px; }
+
+.section-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+  margin-top: 4px;
+}
+
+svg { display: block; margin: 0 auto; }
+</style>
+<!-- interactive.css:end -->
+<style>
+  body { color: #172033; }
+  h1 { font-size: 22px; line-height: 1.25; margin-bottom: 6px; }
+  h2 { font-size: 16px; margin-bottom: 10px; }
+  h3 { font-size: 14px; margin-bottom: 8px; }
+  .kicker { color: var(--text-muted); font-size: 12px; }
+  .section-title { font-size: 15px; font-weight: 800; margin-bottom: 10px; }
+  .toc { display: grid; gap: 8px; }
+  .toc a {
+    display: block;
+    color: var(--text);
+    text-decoration: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 10px;
+    background: #fff;
+    font-size: 13px;
+  }
+  .toc a:hover { border-color: var(--accent); color: var(--accent); }
+  .concept-map {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .concept-box {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    background: #fff;
+  }
+  .concept-box strong { display: block; margin-bottom: 4px; }
+  .concept-box .tag {
+    display: inline-block;
+    border-radius: 999px;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .tag-contract { background: #fef3c7; color: #92400e; }
+  .tag-spot { background: #dbeafe; color: #1d4ed8; }
+  .timeline {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .time-step {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px;
+    min-height: 120px;
+    background: #fff;
+    position: relative;
+  }
+  .time-step::before {
+    content: "";
+    display: block;
+    height: 4px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+  }
+  .time-step.contract::before { background: #f59e0b; }
+  .time-step.da::before { background: #2563eb; }
+  .time-step.id::before { background: #0891b2; }
+  .time-step.rt::before { background: #dc2626; }
+  .time-step b { display: block; font-size: 14px; }
+  .time-step span { color: var(--text-muted); font-size: 12px; }
+  .rule-tabs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .rule-btn {
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 6px;
+    padding: 9px 10px;
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .rule-btn.active {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: #fff;
+  }
+  .diagram-wrap {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(280px, 0.95fr);
+    gap: 14px;
+    align-items: stretch;
+  }
+  .chart-shell {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #fff;
+    padding: 10px;
+    overflow: auto;
+  }
+  svg text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+  .node { stroke: #172033; stroke-width: 2; }
+  .node-label { fill: #172033; font-weight: 800; font-size: 13px; }
+  .price-label { fill: #172033; font-weight: 800; font-size: 12px; }
+  .line { stroke: #94a3b8; stroke-width: 4; stroke-linecap: round; }
+  .line.congested { stroke: #dc2626; stroke-dasharray: 8 5; }
+  .bar { stroke: #fff; stroke-width: 1; }
+  .axis { stroke: #cbd5e1; stroke-width: 1; }
+  .axis-label { fill: #64748b; font-size: 11px; }
+  .settlement-grid {
+    display: grid;
+    grid-template-columns: minmax(280px, 0.9fr) minmax(0, 1.1fr);
+    gap: 14px;
+  }
+  .field-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .field {
+    display: grid;
+    gap: 4px;
+  }
+  .field label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-muted);
+  }
+  .field input, .field select {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 9px;
+    font: inherit;
+    font-size: 13px;
+    background: #fff;
+  }
+  .result-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .result-table th, .result-table td {
+    border-bottom: 1px solid var(--border);
+    padding: 8px 6px;
+    text-align: right;
+  }
+  .result-table th:first-child, .result-table td:first-child { text-align: left; }
+  .result-table tfoot td {
+    font-weight: 800;
+    font-size: 14px;
+    border-bottom: 0;
+  }
+  .positive { color: #15803d; }
+  .negative { color: #b91c1c; }
+  .compact-list { padding-left: 18px; color: var(--text-muted); font-size: 13px; }
+  .compact-list li { margin-bottom: 4px; }
+  .mini-switch {
+    display: inline-grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .mini-switch button {
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 6px;
+    padding: 7px 10px;
+    cursor: pointer;
+    font: inherit;
+    font-size: 13px;
+  }
+  .mini-switch button.active {
+    color: #fff;
+    background: #172033;
+    border-color: #172033;
+  }
+  @media (max-width: 980px) {
+    .layout { display: block; }
+    .layout > .sidebar { width: auto; }
+    .concept-map, .timeline, .diagram-wrap, .settlement-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="panel">
+      <h1>电力市场价格与结算关系</h1>
+      <p class="kicker">把中长期、日前、日内、实时价格和 SMP/ZMP/LMP 分开理解</p>
+    </div>
+
+    <div class="panel">
+      <div class="section-title">页面导航</div>
+      <nav class="toc">
+        <a href="#map">1. 四类价格的关系</a>
+        <a href="#rules">2. SMP / ZMP / LMP 图解</a>
+        <a href="#settlement">3. 发电方和用电方结算器</a>
+        <a href="#takeaways">4. 关键结论</a>
+      </nav>
+    </div>
+
+    <div class="panel">
+      <div class="section-title">先记住一句话</div>
+      <div class="notice">
+        中长期价不是现货价。日前价、日内价、实时价都是现货价；SMP、ZMP、LMP 是这些现货价在空间上怎么形成的规则。
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <section class="panel" id="map">
+      <div class="section-title">1. 四类价格的关系</div>
+      <div class="concept-map">
+        <div class="concept-box">
+          <span class="tag tag-contract">合约价格</span>
+          <strong>中长期合约价</strong>
+          <p>用于锁定一部分电量的价格风险。它更像“保险价”或“锁价”，不等同于某个运行时刻的系统边际价值。</p>
+        </div>
+        <div class="concept-box">
+          <span class="tag tag-spot">现货价格</span>
+          <strong>日前现货价</strong>
+          <p>运行日前一天形成，基于日前预测和安全约束安排次日主计划。</p>
+        </div>
+        <div class="concept-box">
+          <span class="tag tag-spot">现货价格</span>
+          <strong>日内现货价</strong>
+          <p>运行日内滚动形成，用于修正日前计划，比如风光、负荷、联络线变化。</p>
+        </div>
+        <div class="concept-box">
+          <span class="tag tag-spot">现货价格</span>
+          <strong>实时/平衡现货价</strong>
+          <p>最接近实际运行，通常用于处理最终偏差和平衡系统。</p>
+        </div>
+      </div>
+
+      <div class="timeline">
+        <div class="time-step contract">
+          <b>中长期</b>
+          <span>年前、月前、周前等</span>
+          <p>锁定合同电量和合同价格，降低波动风险。</p>
+        </div>
+        <div class="time-step da">
+          <b>日前</b>
+          <span>D-1 日</span>
+          <p>形成 D 日主计划和日前现货价格。</p>
+        </div>
+        <div class="time-step id">
+          <b>日内</b>
+          <span>D 日滚动</span>
+          <p>对后续时段做计划调整，形成日内现货价格。</p>
+        </div>
+        <div class="time-step rt">
+          <b>实时/平衡</b>
+          <span>临近交割</span>
+          <p>处理最后偏差，形成实时或平衡价格。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="rules">
+      <div class="section-title">2. SMP / ZMP / LMP 图解</div>
+      <div class="explain">
+        日前、日内、实时回答“什么时候出清”。SMP、ZMP、LMP 回答“同一个时段，价格按什么空间粒度形成”。
+      </div>
+      <div class="rule-tabs" role="tablist" aria-label="价格机制">
+        <button class="rule-btn active" data-rule="smp">SMP 全网一个价</button>
+        <button class="rule-btn" data-rule="zmp">ZMP 分区一个价</button>
+        <button class="rule-btn" data-rule="lmp">LMP 节点一个价</button>
+      </div>
+      <div class="diagram-wrap">
+        <div class="chart-shell">
+          <svg id="network" width="560" height="330" viewBox="0 0 560 330" aria-label="电网价格机制示意图"></svg>
+        </div>
+        <div>
+          <div class="card">
+            <h3 id="ruleTitle">SMP 系统边际电价</h3>
+            <p id="ruleText"></p>
+          </div>
+          <div class="card">
+            <h3>供给排序示意</h3>
+            <svg id="merit" width="420" height="210" viewBox="0 0 420 210" aria-label="供给排序曲线"></svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="settlement">
+      <div class="section-title">3. 发电方和用电方结算器</div>
+      <div class="explain warning">
+        这是教学模型，用来理解“合约差价 + 日前 + 日内 + 实时偏差”的方向。实际账单还会包含辅助服务、容量补偿、输配电价、政府性基金、考核费用、分摊返还等项目。
+      </div>
+
+      <div class="mini-switch" aria-label="结算主体">
+        <button id="generatorMode" class="active" type="button">发电方收益</button>
+        <button id="consumerMode" type="button">用电方账单</button>
+      </div>
+
+      <div class="settlement-grid">
+        <div class="panel" style="margin-bottom:0;">
+          <h2>输入参数</h2>
+          <div class="field-grid">
+            <div class="field">
+              <label for="contractQty">中长期合约量 MWh</label>
+              <input id="contractQty" type="number" value="100" step="1">
+            </div>
+            <div class="field">
+              <label for="contractPrice">中长期合约价 元/MWh</label>
+              <input id="contractPrice" type="number" value="400" step="1">
+            </div>
+            <div class="field">
+              <label for="dayAheadQty">日前成交量 MWh</label>
+              <input id="dayAheadQty" type="number" value="120" step="1">
+            </div>
+            <div class="field">
+              <label for="dayAheadPrice">日前价格 元/MWh</label>
+              <input id="dayAheadPrice" type="number" value="350" step="1">
+            </div>
+            <div class="field">
+              <label for="intradayQty">日内调整量 MWh</label>
+              <input id="intradayQty" type="number" value="10" step="1">
+            </div>
+            <div class="field">
+              <label for="intradayPrice">日内价格 元/MWh</label>
+              <input id="intradayPrice" type="number" value="370" step="1">
+            </div>
+            <div class="field">
+              <label for="actualQty" id="actualQtyLabel">实际发电量 MWh</label>
+              <input id="actualQty" type="number" value="125" step="1">
+            </div>
+            <div class="field">
+              <label for="realTimePrice">实时/平衡价格 元/MWh</label>
+              <input id="realTimePrice" type="number" value="600" step="1">
+            </div>
+            <div class="field">
+              <label for="costPrice" id="costPriceLabel">发电变动成本 元/MWh</label>
+              <input id="costPrice" type="number" value="280" step="1">
+            </div>
+            <div class="field">
+              <label for="referencePrice">合约差价参考价</label>
+              <select id="referencePrice">
+                <option value="da">日前价格</option>
+                <option value="rt">实时价格</option>
+                <option value="weighted">日前和实时加权</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-bottom:0;">
+          <h2 id="resultTitle">发电方收益拆解</h2>
+          <table class="result-table">
+            <thead>
+              <tr>
+                <th>项目</th>
+                <th>公式</th>
+                <th>金额 元</th>
+              </tr>
+            </thead>
+            <tbody id="resultBody"></tbody>
+            <tfoot>
+              <tr>
+                <td id="totalLabel">最终净收益</td>
+                <td></td>
+                <td id="totalValue"></td>
+              </tr>
+            </tfoot>
+          </table>
+          <div class="formula" id="settlementFormula"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="takeaways">
+      <div class="section-title">4. 关键结论</div>
+      <ul class="compact-list">
+        <li>“现货价”是日前、日内、实时/平衡价格的总称，不是第 5 个价格。</li>
+        <li>收益或账单要按电量来源拆：日前成交电量用日前价，日内调整电量用日内价，实时偏差电量用实时价。</li>
+        <li>中长期合约通常通过差价结算锁定风险：合约量 × (合约价 - 规则指定的现货参考价)。</li>
+        <li>SMP、ZMP、LMP 是现货出清后的空间定价规则：全网一个价、分区一个价、节点一个价。</li>
+        <li>LMP 最细，能够把发电成本、阻塞和网损转换成不同节点的价格信号。</li>
+      </ul>
+    </section>
+  </main>
+</div>
+
+<script>
+const ruleData = {
+  smp: {
+    title: "SMP 系统边际电价",
+    text: "全系统一个价格。忽略或简化网络阻塞后，最后满足全网负荷的边际机组决定统一出清价。",
+    prices: { a: 360, b: 360, c: 360 },
+    congested: []
+  },
+  zmp: {
+    title: "ZMP 分区边际电价",
+    text: "把电网分成送端区和受端区。区内同价，区间通道拥堵时，送端低价、受端高价。",
+    prices: { a: 260, b: 260, c: 520 },
+    congested: ["bc"]
+  },
+  lmp: {
+    title: "LMP 节点边际电价",
+    text: "每个节点一个价格。节点价反映在该节点多供应 1MWh 电力的边际成本，包含电能、阻塞和网损信号。",
+    prices: { a: 180, b: 300, c: 520 },
+    congested: ["ab", "bc"]
+  }
+};
+
+let activeRule = "smp";
+let mode = "generator";
+
+function money(n) {
+  const value = Number.isFinite(n) ? n : 0;
+  return value.toLocaleString("zh-CN", { maximumFractionDigits: 0 });
+}
+
+function signedClass(n) {
+  if (n > 0) return "positive";
+  if (n < 0) return "negative";
+  return "";
+}
+
+function readNumber(id) {
+  return Number(document.getElementById(id).value || 0);
+}
+
+function referencePriceValue(v) {
+  if (v.refMode === "rt") return v.rtPrice;
+  if (v.refMode === "weighted") {
+    const planned = Math.max(v.daQty + v.idQty, 0);
+    const rtDeviationAbs = Math.abs(v.actualQty - planned);
+    const total = planned + rtDeviationAbs;
+    if (total === 0) return 0;
+    return (planned * v.daPrice + rtDeviationAbs * v.rtPrice) / total;
+  }
+  return v.daPrice;
+}
+
+function collectInputs() {
+  return {
+    contractQty: readNumber("contractQty"),
+    contractPrice: readNumber("contractPrice"),
+    daQty: readNumber("dayAheadQty"),
+    daPrice: readNumber("dayAheadPrice"),
+    idQty: readNumber("intradayQty"),
+    idPrice: readNumber("intradayPrice"),
+    actualQty: readNumber("actualQty"),
+    rtPrice: readNumber("realTimePrice"),
+    costPrice: readNumber("costPrice"),
+    refMode: document.getElementById("referencePrice").value
+  };
+}
+
+function setMode(nextMode) {
+  mode = nextMode;
+  document.getElementById("generatorMode").classList.toggle("active", mode === "generator");
+  document.getElementById("consumerMode").classList.toggle("active", mode === "consumer");
+  document.getElementById("actualQtyLabel").textContent = mode === "generator" ? "实际发电量 MWh" : "实际用电量 MWh";
+  document.getElementById("costPriceLabel").textContent = mode === "generator" ? "发电变动成本 元/MWh" : "输配基金等附加 元/MWh";
+  document.getElementById("resultTitle").textContent = mode === "generator" ? "发电方收益拆解" : "用电方账单拆解";
+  document.getElementById("totalLabel").textContent = mode === "generator" ? "最终净收益" : "最终应付账单";
+  updateSettlement();
+}
+
+function updateSettlement() {
+  const v = collectInputs();
+  const plannedAfterId = v.daQty + v.idQty;
+  const rtDeviation = v.actualQty - plannedAfterId;
+  const refPrice = referencePriceValue(v);
+  const contractDiff = v.contractQty * (v.contractPrice - refPrice);
+  const daAmount = v.daQty * v.daPrice;
+  const idAmount = v.idQty * v.idPrice;
+  const rtAmount = rtDeviation * v.rtPrice;
+  const operatingCost = v.actualQty * v.costPrice;
+
+  const rows = [];
+  if (mode === "generator") {
+    rows.push(["日前电能量收入", `${v.daQty} × ${v.daPrice}`, daAmount]);
+    rows.push(["日内调整收入", `${v.idQty} × ${v.idPrice}`, idAmount]);
+    rows.push(["实时偏差收入", `${rtDeviation} × ${v.rtPrice}`, rtAmount]);
+    rows.push(["中长期合约差价", `${v.contractQty} × (${v.contractPrice} - ${refPrice.toFixed(0)})`, contractDiff]);
+    rows.push(["发电变动成本", `-${v.actualQty} × ${v.costPrice}`, -operatingCost]);
+  } else {
+    rows.push(["日前购电成本", `${v.daQty} × ${v.daPrice}`, daAmount]);
+    rows.push(["日内调整成本", `${v.idQty} × ${v.idPrice}`, idAmount]);
+    rows.push(["实时偏差成本", `${rtDeviation} × ${v.rtPrice}`, rtAmount]);
+    rows.push(["中长期合约差价", `${v.contractQty} × (${v.contractPrice} - ${refPrice.toFixed(0)})`, contractDiff]);
+    rows.push(["输配基金等附加", `${v.actualQty} × ${v.costPrice}`, operatingCost]);
+  }
+
+  const total = rows.reduce((sum, row) => sum + row[2], 0);
+  document.getElementById("resultBody").innerHTML = rows.map(([name, formula, amount]) => (
+    `<tr><td>${name}</td><td>${formula}</td><td class="${signedClass(amount)}">${money(amount)}</td></tr>`
+  )).join("");
+  document.getElementById("totalValue").className = signedClass(total);
+  document.getElementById("totalValue").textContent = money(total);
+
+  const formulaLabel = mode === "generator" ? "发电方" : "用电方";
+  document.getElementById("settlementFormula").innerHTML =
+    `${formulaLabel}总额 = 日前量×日前价 + 日内调整量×日内价 + 实时偏差量×实时价 + 合约量×(合约价 - 现货参考价)` +
+    (mode === "generator" ? " - 实际发电量×变动成本" : " + 实际用电量×附加费用") +
+    `<br>当前实时偏差量 = 实际量 ${v.actualQty} - (日前量 ${v.daQty} + 日内调整量 ${v.idQty}) = ${rtDeviation} MWh`;
+}
+
+function drawNetwork() {
+  const data = ruleData[activeRule];
+  document.getElementById("ruleTitle").textContent = data.title;
+  document.getElementById("ruleText").textContent = data.text;
+
+  const isCongested = key => data.congested.includes(key);
+  const svg = document.getElementById("network");
+  const nodes = {
+    a: { x: 115, y: 95, name: "节点A", gen: "便宜电源", color: "#bfdbfe" },
+    b: { x: 115, y: 235, name: "节点B", gen: "中等电源", color: "#bbf7d0" },
+    c: { x: 410, y: 165, name: "节点C", gen: "负荷中心", color: "#fecaca" }
+  };
+  const line = (a, b, key, label) => `
+    <line x1="${nodes[a].x}" y1="${nodes[a].y}" x2="${nodes[b].x}" y2="${nodes[b].y}" class="line ${isCongested(key) ? "congested" : ""}" />
+    <text x="${(nodes[a].x + nodes[b].x) / 2}" y="${(nodes[a].y + nodes[b].y) / 2 - 8}" text-anchor="middle" class="axis-label">${label}</text>
+  `;
+  const node = key => {
+    const n = nodes[key];
+    return `
+      <circle cx="${n.x}" cy="${n.y}" r="46" fill="${n.color}" class="node" />
+      <text x="${n.x}" y="${n.y - 10}" text-anchor="middle" class="node-label">${n.name}</text>
+      <text x="${n.x}" y="${n.y + 9}" text-anchor="middle" class="axis-label">${n.gen}</text>
+      <text x="${n.x}" y="${n.y + 29}" text-anchor="middle" class="price-label">${data.prices[key]} 元/MWh</text>
+    `;
+  };
+  svg.innerHTML = `
+    <rect x="0" y="0" width="560" height="330" rx="8" fill="#f8fafc" />
+    ${line("a", "b", "ab", "内部断面")}
+    ${line("a", "c", "ac", "输电通道")}
+    ${line("b", "c", "bc", "输电通道")}
+    ${node("a")}
+    ${node("b")}
+    ${node("c")}
+    <text x="280" y="304" text-anchor="middle" class="axis-label">红色虚线表示该定价规则下需要显式反映的阻塞约束</text>
+  `;
+  drawMerit();
+}
+
+function drawMerit() {
+  const svg = document.getElementById("merit");
+  const units = [
+    { name: "G1", qty: 70, price: 180, color: "#93c5fd" },
+    { name: "G2", qty: 50, price: 300, color: "#86efac" },
+    { name: "G3", qty: 45, price: 520, color: "#fca5a5" }
+  ];
+  const maxQty = 165;
+  const maxPrice = 650;
+  const x0 = 42, y0 = 176, w = 340, h = 140;
+  let x = x0;
+  const bars = units.map(u => {
+    const bw = u.qty / maxQty * w;
+    const bh = u.price / maxPrice * h;
+    const out = `
+      <rect x="${x}" y="${y0 - bh}" width="${bw}" height="${bh}" fill="${u.color}" class="bar" />
+      <text x="${x + bw / 2}" y="${y0 - bh - 6}" text-anchor="middle" class="axis-label">${u.price}</text>
+      <text x="${x + bw / 2}" y="${y0 + 15}" text-anchor="middle" class="axis-label">${u.name}</text>
+    `;
+    x += bw;
+    return out;
+  }).join("");
+  const markerX = activeRule === "smp" ? x0 + 128 / maxQty * w : activeRule === "zmp" ? x0 + 120 / maxQty * w : x0 + 144 / maxQty * w;
+  const label = activeRule === "smp" ? "统一边际价" : activeRule === "zmp" ? "分区边际价" : "节点边际价";
+  svg.innerHTML = `
+    <rect x="0" y="0" width="420" height="210" rx="8" fill="#fff" />
+    <line x1="${x0}" y1="${y0}" x2="${x0 + w}" y2="${y0}" class="axis" />
+    <line x1="${x0}" y1="${y0}" x2="${x0}" y2="${y0 - h}" class="axis" />
+    ${bars}
+    <line x1="${markerX}" y1="${y0}" x2="${markerX}" y2="${y0 - h - 8}" stroke="#172033" stroke-width="2" stroke-dasharray="5 4" />
+    <text x="${markerX}" y="22" text-anchor="middle" class="price-label">${label}</text>
+    <text x="${x0 - 10}" y="${y0 - h + 6}" text-anchor="end" class="axis-label">价格</text>
+    <text x="${x0 + w}" y="${y0 + 32}" text-anchor="end" class="axis-label">电量</text>
+  `;
+}
+
+document.querySelectorAll(".rule-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    activeRule = btn.dataset.rule;
+    document.querySelectorAll(".rule-btn").forEach(b => b.classList.toggle("active", b === btn));
+    drawNetwork();
+  });
+});
+
+document.getElementById("generatorMode").addEventListener("click", () => setMode("generator"));
+document.getElementById("consumerMode").addEventListener("click", () => setMode("consumer"));
+document.querySelectorAll("input, select").forEach(el => el.addEventListener("input", updateSettlement));
+document.querySelectorAll("input, select").forEach(el => el.addEventListener("change", updateSettlement));
+
+drawNetwork();
+updateSettlement();
+</script>
+</body>
+</html>
