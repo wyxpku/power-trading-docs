@@ -275,6 +275,77 @@ svg { display: block; margin: 0 auto; }
     grid-template-columns: 1fr 1fr;
     gap: 12px;
   }
+  .price-blocks {
+    display: grid;
+    grid-template-columns: minmax(260px, 0.85fr) minmax(0, 1.15fr);
+    gap: 14px;
+    align-items: stretch;
+  }
+  .price-block {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #fff;
+    padding: 14px;
+  }
+  .price-block.contract {
+    border-top: 4px solid #f59e0b;
+    background: #fffbeb;
+  }
+  .price-block.spot {
+    border-top: 4px solid #2563eb;
+    background: #eff6ff;
+  }
+  .price-block h3 {
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+  .price-block-lead {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-bottom: 10px;
+  }
+  .price-feature {
+    display: grid;
+    gap: 6px;
+    margin-top: 10px;
+  }
+  .price-feature div {
+    border: 1px solid rgba(148, 163, 184, 0.45);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.72);
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+  .spot-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .spot-card {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #fff;
+    padding: 10px;
+  }
+  .spot-card::before {
+    content: "";
+    display: block;
+    height: 4px;
+    border-radius: 999px;
+    margin-bottom: 8px;
+  }
+  .spot-card.da::before { background: #2563eb; }
+  .spot-card.id::before { background: #0891b2; }
+  .spot-card.rt::before { background: #dc2626; }
+  .spot-card strong { display: block; font-size: 14px; margin-bottom: 4px; }
+  .spot-card .window {
+    color: var(--accent);
+    font-weight: 800;
+    font-size: 12px;
+    margin-bottom: 6px;
+  }
+  .spot-card p { font-size: 13px; margin-bottom: 6px; }
+  .spot-card small { color: var(--text-muted); display: block; line-height: 1.45; }
   .concept-box {
     border: 1px solid var(--border);
     border-radius: 8px;
@@ -366,6 +437,48 @@ svg { display: block; margin: 0 auto; }
     grid-template-columns: minmax(280px, 0.9fr) minmax(0, 1.1fr);
     gap: 14px;
   }
+  .settlement-visual {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #fff;
+    padding: 12px;
+    margin-bottom: 14px;
+  }
+  .settlement-visual h2 {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: baseline;
+  }
+  .flow-hint {
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .flow-chart {
+    width: 100%;
+    min-height: 330px;
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #f8fafc;
+  }
+  .flow-chart svg {
+    min-width: 860px;
+    display: block;
+  }
+  .flow-box { stroke: #cbd5e1; stroke-width: 1.2; rx: 8; }
+  .flow-box.contract { fill: #fffbeb; stroke: #f59e0b; }
+  .flow-box.da { fill: #eff6ff; stroke: #2563eb; }
+  .flow-box.id { fill: #ecfeff; stroke: #0891b2; }
+  .flow-box.rt { fill: #fef2f2; stroke: #dc2626; }
+  .flow-box.total { fill: #f0fdf4; stroke: #16a34a; stroke-width: 1.8; }
+  .flow-title { fill: #172033; font-size: 13px; font-weight: 800; }
+  .flow-subtitle { fill: #64748b; font-size: 11px; }
+  .flow-amount { fill: #172033; font-size: 15px; font-weight: 800; }
+  .flow-amount.positive { fill: #15803d; }
+  .flow-amount.negative { fill: #b91c1c; }
+  .flow-line { stroke: #94a3b8; stroke-width: 2; fill: none; marker-end: url(#arrow); }
   .field-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -432,7 +545,7 @@ svg { display: block; margin: 0 auto; }
   @media (max-width: 980px) {
     .layout { display: block; }
     .layout > .sidebar { width: auto; }
-    .concept-map, .timeline, .diagram-wrap, .settlement-grid { grid-template-columns: 1fr; }
+    .concept-map, .price-blocks, .spot-grid, .timeline, .diagram-wrap, .settlement-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -465,26 +578,42 @@ svg { display: block; margin: 0 auto; }
   <main class="main">
     <section class="panel" id="map">
       <div class="section-title">1. 四类价格的关系</div>
-      <div class="concept-map">
-        <div class="concept-box">
+      <div class="price-blocks">
+        <div class="price-block contract">
           <span class="tag tag-contract">合约价格</span>
-          <strong>中长期合约价</strong>
-          <p>用于锁定一部分电量的价格风险。它更像“保险价”或“锁价”，不等同于某个运行时刻的系统边际价值。</p>
+          <h3>中长期合约价</h3>
+          <p class="price-block-lead">年前、月前、周前等更早周期形成，用来锁定一部分电量的收益或购电成本。</p>
+          <div class="price-feature">
+            <div><strong>核心作用：</strong>锁风险，不是发现实时边际价值。</div>
+            <div><strong>结算关系：</strong>常通过“合约价 - 现货参考价”做差价结算。</div>
+            <div><strong>典型影响：</strong>现货低价时保护卖方收益，现货高价时限制卖方上行收益。</div>
+          </div>
         </div>
-        <div class="concept-box">
+
+        <div class="price-block spot">
           <span class="tag tag-spot">现货价格</span>
-          <strong>日前现货价</strong>
-          <p>运行日前一天形成，基于日前预测和安全约束安排次日主计划。</p>
-        </div>
-        <div class="concept-box">
-          <span class="tag tag-spot">现货价格</span>
-          <strong>日内现货价</strong>
-          <p>运行日内滚动形成，用于修正日前计划，比如风光、负荷、联络线变化。</p>
-        </div>
-        <div class="concept-box">
-          <span class="tag tag-spot">现货价格</span>
-          <strong>实时/平衡现货价</strong>
-          <p>最接近实际运行，通常用于处理最终偏差和平衡系统。</p>
+          <h3>日前、日内、实时/平衡价格</h3>
+          <p class="price-block-lead">现货价不是单独第 5 个价格，而是下面三类价格的总称；越接近实际运行，更新越频繁，也越像“最后纠偏价”。</p>
+          <div class="spot-grid">
+            <div class="spot-card da">
+              <strong>日前现货价</strong>
+              <div class="window">更新时间：D-1 日，通常一次出清次日 24h</div>
+              <p>基于日前负荷、新能源、机组状态和网架约束，形成运行日主计划。</p>
+              <small>常见颗粒度：15min 为一个交易时段，即次日 96 点。</small>
+            </div>
+            <div class="spot-card id">
+              <strong>日内现货价</strong>
+              <div class="window">更新时间：D 日滚动，常见 15-60min 或 2h 一次</div>
+              <p>在日前闭市后继续修正后续时段计划，吸收预测和边界变化。</p>
+              <small>例：省间日内现货可按 2h 固定周期组织，一天 12 次。</small>
+            </div>
+            <div class="spot-card rt">
+              <strong>实时/平衡现货价</strong>
+              <div class="window">更新时间：临近交割，常见 5-15min 滚动</div>
+              <p>处理实际运行偏差，反映最接近当下的供需紧张和网络约束。</p>
+              <small>常用于实际执行曲线相对日前计划的偏差结算。</small>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -548,6 +677,16 @@ svg { display: block; margin: 0 auto; }
       <div class="mini-switch" aria-label="结算主体">
         <button id="generatorMode" class="active" type="button">发电方收益</button>
         <button id="consumerMode" type="button">用电方账单</button>
+      </div>
+
+      <div class="settlement-visual">
+        <h2>
+          <span id="flowTitle">发电方结算流向图</span>
+          <span class="flow-hint">每个价格和交易量对应一个核算款项</span>
+        </h2>
+        <div class="flow-chart">
+          <svg id="settlementFlow" width="920" height="330" viewBox="0 0 920 330" aria-label="结算流向图"></svg>
+        </div>
       </div>
 
       <div class="settlement-grid">
@@ -713,6 +852,7 @@ function setMode(nextMode) {
   document.getElementById("costPriceLabel").textContent = mode === "generator" ? "发电变动成本 元/MWh" : "输配基金等附加 元/MWh";
   document.getElementById("resultTitle").textContent = mode === "generator" ? "发电方收益拆解" : "用电方账单拆解";
   document.getElementById("totalLabel").textContent = mode === "generator" ? "最终净收益" : "最终应付账单";
+  document.getElementById("flowTitle").textContent = mode === "generator" ? "发电方结算流向图" : "用电方结算流向图";
   updateSettlement();
 }
 
@@ -754,6 +894,101 @@ function updateSettlement() {
     `${formulaLabel}总额 = 日前量×日前价 + 日内调整量×日内价 + 实时偏差量×实时价 + 合约量×(合约价 - 现货参考价)` +
     (mode === "generator" ? " - 实际发电量×变动成本" : " + 实际用电量×附加费用") +
     `<br>当前实时偏差量 = 实际量 ${v.actualQty} - (日前量 ${v.daQty} + 日内调整量 ${v.idQty}) = ${rtDeviation} MWh`;
+  drawSettlementFlow({
+    v,
+    refPrice,
+    plannedAfterId,
+    rtDeviation,
+    amounts: { daAmount, idAmount, rtAmount, contractDiff, operatingCost, total }
+  });
+}
+
+function flowAmountClass(amount) {
+  if (amount > 0) return "positive";
+  if (amount < 0) return "negative";
+  return "";
+}
+
+function drawSettlementFlow(state) {
+  const { v, refPrice, rtDeviation, amounts } = state;
+  const svg = document.getElementById("settlementFlow");
+  const totalLabel = mode === "generator" ? "最终净收益" : "最终应付账单";
+  const costLabel = mode === "generator" ? "发电变动成本" : "输配基金等附加";
+  const costAmount = mode === "generator" ? -amounts.operatingCost : amounts.operatingCost;
+  const entries = [
+    {
+      cls: "contract",
+      title: "中长期合约差价",
+      formula: `${v.contractQty} MWh × (${v.contractPrice} - ${refPrice.toFixed(0)})`,
+      amount: amounts.contractDiff,
+      x: 36,
+      y: 34
+    },
+    {
+      cls: "da",
+      title: mode === "generator" ? "日前电能量收入" : "日前购电成本",
+      formula: `${v.daQty} MWh × ${v.daPrice}`,
+      amount: amounts.daAmount,
+      x: 36,
+      y: 142
+    },
+    {
+      cls: "id",
+      title: mode === "generator" ? "日内调整收入" : "日内调整成本",
+      formula: `${v.idQty} MWh × ${v.idPrice}`,
+      amount: amounts.idAmount,
+      x: 326,
+      y: 34
+    },
+    {
+      cls: "rt",
+      title: mode === "generator" ? "实时偏差收入" : "实时偏差成本",
+      formula: `${rtDeviation} MWh × ${v.rtPrice}`,
+      amount: amounts.rtAmount,
+      x: 326,
+      y: 142
+    },
+    {
+      cls: "da",
+      title: costLabel,
+      formula: `${mode === "generator" ? "-" : ""}${v.actualQty} MWh × ${v.costPrice}`,
+      amount: costAmount,
+      x: 181,
+      y: 244
+    }
+  ];
+
+  const box = item => `
+    <rect x="${item.x}" y="${item.y}" width="250" height="74" class="flow-box ${item.cls}" />
+    <text x="${item.x + 14}" y="${item.y + 23}" class="flow-title">${item.title}</text>
+    <text x="${item.x + 14}" y="${item.y + 43}" class="flow-subtitle">${item.formula}</text>
+    <text x="${item.x + 14}" y="${item.y + 64}" class="flow-amount ${flowAmountClass(item.amount)}">${money(item.amount)} 元</text>
+  `;
+  const line = item => {
+    const startX = item.x + 250;
+    const startY = item.y + 37;
+    const endX = 672;
+    const endY = 165;
+    return `<path d="M ${startX} ${startY} C ${startX + 48} ${startY}, ${endX - 52} ${endY}, ${endX} ${endY}" class="flow-line" />`;
+  };
+
+  svg.innerHTML = `
+    <defs>
+      <marker id="arrow" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+        <path d="M0,0 L0,6 L8,3 z" fill="#94a3b8" />
+      </marker>
+    </defs>
+    <rect x="0" y="0" width="920" height="330" rx="8" fill="#f8fafc" />
+    <text x="36" y="20" class="flow-subtitle">交易/价格输入</text>
+    <text x="680" y="20" class="flow-subtitle">核算汇总</text>
+    ${entries.map(line).join("")}
+    ${entries.map(box).join("")}
+    <rect x="682" y="118" width="202" height="94" class="flow-box total" />
+    <text x="700" y="146" class="flow-title">${totalLabel}</text>
+    <text x="700" y="169" class="flow-subtitle">所有核算款项相加</text>
+    <text x="700" y="194" class="flow-amount ${flowAmountClass(amounts.total)}">${money(amounts.total)} 元</text>
+    <text x="36" y="316" class="flow-subtitle">图中的正负号沿用表格方向：正数增加收益/账单，负数减少收益/账单。</text>
+  `;
 }
 
 function drawNetwork() {
