@@ -7,7 +7,7 @@ Reads:
 
 Writes:
   - book-vitepress/preface.md
-  - book-vitepress/chXX/index.md (31 chapters)
+  - book-vitepress/chXX.md (31 chapters)
   - book-vitepress/appendix-a.md, appendix-b.md
 """
 import html as html_mod
@@ -158,7 +158,7 @@ def get_chapter_file_info(chapter: Dict) -> tuple:
         return (VITEPRESS_DIR / "preface.md", title)
     elif html_file.startswith("chapter_"):
         num = html_file.replace("chapter_", "").replace(".html", "")
-        return (VITEPRESS_DIR / f"ch{num}" / "index.md", title)
+        return (VITEPRESS_DIR / f"ch{num}.md", title)
     elif html_file == "appendix_a.html":
         return (VITEPRESS_DIR / "appendix-a.md", title)
     elif html_file == "appendix_b.html":
